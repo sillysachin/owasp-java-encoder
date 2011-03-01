@@ -15,6 +15,9 @@
  */
 package org.owasp.encoder;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.owasp.encoder.Encoder;
 
 import junit.framework.Test;
@@ -34,6 +37,177 @@ public class EncoderTest extends TestCase {
     //private static final Character LESS_THAN = Character.valueOf('<');
     //private static final Character SINGLE_QUOTE = Character.valueOf('\'');
 
+	
+	//from JXT
+    public void testEscapeJava() {
+        assertEquals("abc", Encoder.JAVA_STRING.apply("abc"));
+        assertEquals("\\\"", Encoder.JAVA_STRING.apply("\""));
+    }
+
+    public void testEscapeXML() {
+        assertEquals("abc", Encoder.XML.apply("abc"));
+        assertEquals("&lt;&gt;&amp;&#39;&#34;", Encoder.XML.apply("<>&\'\""));
+    }
+
+    public void testEscapeXMLRemoveInvalidChars() {
+        // keep valid characters
+        assertEquals("A\rB\nC\tD E", Encoder.XML.apply("A\rB\nC\tD E"));
+
+        // invalid characters (non-surrogates)
+        assertEquals("A B C", Encoder.XML.apply("A\u0019B\ufffeC"));
+        // unmatched surrogate characters
+        assertEquals("X Y Z", Encoder.XML.apply("X\uD800Y\uDfffZ"));
+        // high-surrogate-at-end
+        assertEquals("HS ", Encoder.XML.apply("HS\uDBFF"));
+
+        // check that valid surrogate pairs are let through
+        char[] spair = new char[2];
+        int n = Character.toChars(0x10000, spair, 0);
+        assertEquals(2, n);
+        assertEquals(new String(spair), Encoder.XML.apply(new String(spair)));
+    }
+
+    public void testEscapeXMLContentRemoveInvalidChars() {
+        // keep valid characters
+        assertEquals("A\rB\nC\tD E", Encoder.XML_CONTENT.apply("A\rB\nC\tD E"));
+
+        // invalid characters (non-surrogates)
+        assertEquals("A B C", Encoder.XML_CONTENT.apply("A\u0019B\ufffeC"));
+        // unmatched surrogate characters
+        assertEquals("X Y Z", Encoder.XML_CONTENT.apply("X\uD800Y\uDfffZ"));
+        // high-surrogate-at-end
+        assertEquals("HS ", Encoder.XML_CONTENT.apply("HS\uDBFF"));
+
+        // check that valid surrogate pairs are let through
+        char[] spair = new char[2];
+        int n = Character.toChars(0x10000, spair, 0);
+        assertEquals(2, n);
+        assertEquals(new String(spair), Encoder.XML_CONTENT.apply(new String(spair)));
+    }
+
+    public void testExceptionMask() {
+        Encoder.XML.apply(new StringBuilder(), "abc");
+        Encoder.XML.apply(new StringBuffer(), "abc");
+        Encoder.XML.apply(new PrintWriter(new StringWriter()), "abc");
+    }
+
+    static void checkEncodeURIComponent(String expected, String input) {
+        String actual = Encoder.URI_COMPONENT.apply(input);
+        assertEquals(expected, actual);
+    }
+
+    public void testEncodeURIComponent() throws Exception {
+        // Characters that do not get encoded
+        checkEncodeURIComponent("abc123xyz890ABC()'*~!._-",
+                                "abc123xyz890ABC()'*~!._-");
+
+        // Space and Plus shenanigans
+        checkEncodeURIComponent("%20%2b", " +");
+
+        // Characters that would confuse URI parameter processing
+        checkEncodeURIComponent("%23%26%25%3d", "#&%=");
+
+        // Unicode characters
+        checkEncodeURIComponent("%c2%a0%ef%bc%aa", "\u00a0\uff2a");
+    }
+
+    static void checkEncodeURI(String expected, String input) {
+        String actual = Encoder.URI.apply(input);
+        assertEquals(expected, actual);
+    }
+
+    public void testEncodeURI() throws Exception {
+        // Characters that do not get encoded
+        checkEncodeURI("abc123xyz890ABC()'*~!._-;,/?:@&=+$",
+                       "abc123xyz890ABC()'*~!._-;,/?:@&=+$");
+
+        // Space and Plus shenanigans
+        checkEncodeURI("%20+", " +");
+
+        // Characters that would confuse URI parameter processing
+        checkEncodeURI("#&%25=", "#&%=");
+
+        // Unicode characters
+        checkEncodeURI("%c2%a0%ef%bc%aa", "\u00a0\uff2a");
+    }
+
+    public void testEncodeXHTML_URI() throws Exception {
+        assertEquals(
+            "abc&amp;123=%3c%3e%20#",
+            Encoder.XHTML_URI.apply("abc&123=<> #"));
+    }
+
+    public void testScriptCode() throws Exception {
+        assertEquals("ab< /x/.exec(z)",
+                     Encoder.SCRIPT_CODE.apply("ab</x/.exec(z)"));
+    }
+
+    public void testSequence() throws Exception {
+        assertEquals("a=%20&amp;b=%c2%a0",
+                     Encoder.XHTML_URI.apply("a= &b=\u00a0"));
+    }
+
+    public void testSequenceOfFour() throws Exception {
+        final String src = "A\"B\'C\\D&E%F<G>H I\nJ";
+
+        // Note:
+        // %5c = '\'
+        // %26 = '&'
+        // %23 = '#'
+        // %3b = ';'
+        final String expected =
+            "A%5c%5c%26%2334%3b"+
+            "B%5c%5c%26%2339%3b"+
+            "C%5c%5c%5c%5c"+
+            "D%26amp%3b"+
+            "E%25"+
+            "F%26lt%3b"+
+            "G%26gt%3b"+
+            "H%20"+
+            "I%5c%5cn"+
+            "J";
+
+        String verify = Encoder.JAVASCRIPT.apply(src);
+        verify = Encoder.XML.apply(verify);
+        verify = Encoder.JAVA_STRING.apply(verify);
+        verify = Encoder.URI_COMPONENT.apply(verify);
+
+        assertEquals(expected, verify);
+
+        assertEquals(expected,
+                     Encoder.forSequence(
+                         Encoder.JAVASCRIPT,
+                         Encoder.XML,
+                         Encoder.JAVA_STRING,
+                         Encoder.URI_COMPONENT).apply(src));
+
+    }
+
+    public void testXmlComment() {
+        assertEquals("inside -~> outside?", Encoder.XML_COMMENT.apply("inside --> outside?"));
+    }
+
+    public void testXmlCommentStart() {
+        // Make sure that "-${foo}" can't be exploited
+        assertEquals("~> end?", Encoder.XML_COMMENT.apply("-> end?"));
+        assertEquals("~-> end?", Encoder.XML_COMMENT.apply("--> end?"));
+    }
+
+    public void testXmlCommentEnd() {
+        // Make sure that "${foo}>" and "${foo}->" can't be exploited and
+        // that "${foo}-->" is always valid
+        assertEquals("comment ~", Encoder.XML_COMMENT.apply("comment -"));
+        assertEquals("comment -~", Encoder.XML_COMMENT.apply("comment --"));
+    }
+
+    public void testXmlCommentRemoveInvalidChars() {
+        assertEquals("A B C D E ",
+                     Encoder.XML_COMMENT.apply("A\u0019B\ufffeC\uD800D\uDfffE\uDBFF"));
+    }
+    
+    //FROM ESAPI
+	
+	
     /**
      * Instantiates a new access reference map test.
      * 
