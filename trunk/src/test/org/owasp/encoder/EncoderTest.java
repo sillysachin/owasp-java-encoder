@@ -15,6 +15,8 @@
  */
 package org.owasp.encoder;
 
+import org.owasp.encoder.Encoder;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -26,21 +28,11 @@ import junit.framework.TestSuite;
  *         href="http://www.aspectsecurity.com">Aspect Security</a>
  * @since June 1, 2007
  */
-public class CodecTest extends TestCase {
+public class EncoderTest extends TestCase {
 
-    private static final char[] EMPTY_CHAR_ARRAY = new char[0];
-    private static final Character LESS_THAN = Character.valueOf('<');
-    private static final Character SINGLE_QUOTE = Character.valueOf('\'');
-    private HTMLEntityCodec htmlCodec = new HTMLEntityCodec();
-    private PercentCodec percentCodec = new PercentCodec();
-    private JavaScriptCodec javaScriptCodec = new JavaScriptCodec();
-    private VBScriptCodec vbScriptCodec = new VBScriptCodec();
-    private CSSCodec cssCodec = new CSSCodec();
-    private MySQLCodec mySQLCodecANSI = new MySQLCodec( MySQLCodec.ANSI_MODE );
-    private MySQLCodec mySQLCodecStandard = new MySQLCodec( MySQLCodec.MYSQL_MODE );
-    private OracleCodec oracleCodec = new OracleCodec();
-    private UnixCodec unixCodec = new UnixCodec();
-    private WindowsCodec windowsCodec = new WindowsCodec();
+    //private static final char[] EMPTY_CHAR_ARRAY = new char[0];
+    //private static final Character LESS_THAN = Character.valueOf('<');
+    //private static final Character SINGLE_QUOTE = Character.valueOf('\'');
 
     /**
      * Instantiates a new access reference map test.
@@ -48,7 +40,7 @@ public class CodecTest extends TestCase {
      * @param testName
      *            the test name
      */
-    public CodecTest(String testName) {
+    public EncoderTest(String testName) {
         super(testName);
     }
 
@@ -74,70 +66,74 @@ public class CodecTest extends TestCase {
      * @return the test
      */
     public static Test suite() {
-        TestSuite suite = new TestSuite(CodecTest.class);
+        TestSuite suite = new TestSuite(EncoderTest.class);
         return suite;
     }
 
-	public void testHtmlEncode()
-	{
-        	assertEquals( "test", htmlCodec.encode( EMPTY_CHAR_ARRAY, "test") );
-	}
-
 	public void testPercentEncode()
 	{
-        	assertEquals( "%3C", percentCodec.encode(EMPTY_CHAR_ARRAY, "<") );
+        	assertEquals( "%3C", Encoder.encodeForURI("<") );
 	}
 
+	public void testHtmlEncode()
+	{
+        	assertEquals( "test", Encoder.encodeForHTML( "test") );
+	}
 
 	public void testJavaScriptEncode()
 	{
-        	assertEquals( "\\x3C", javaScriptCodec.encode(EMPTY_CHAR_ARRAY, "<") );
-	}
-
-	public void testVBScriptEncode()
-	{
-        	assertEquals( "chrw(60)", vbScriptCodec.encode(EMPTY_CHAR_ARRAY, "<") );
+        	assertEquals( "\\x3C", Encoder.encodeForJavascript("<") );
 	}
 
 	public void testCSSEncode()
 	{
-        	assertEquals( "\\3c ", cssCodec.encode(EMPTY_CHAR_ARRAY, "<") );
+        // TODO - need CSS encoding functions
+		//
+		// assertEquals( "\\3c ", cssCodec.encode(EMPTY_CHAR_ARRAY, "<") );
 	}
 
 	public void testCSSInvalidCodepointDecode()
 	{
-		assertEquals("\uFFFDg", cssCodec.decode("\\abcdefg") );
+		// TODO - need CSS encoding functions
+		//
+		//assertEquals("\uFFFDg", cssCodec.decode("\\abcdefg") );
 	}
 
 	public void testMySQLANSCIEncode()
 	{
-        	assertEquals( "\'\'", mySQLCodecANSI.encode(EMPTY_CHAR_ARRAY, "\'") );
+		// TODO
+		//
+		//assertEquals( "\'\'", mySQLCodecANSI.encode(EMPTY_CHAR_ARRAY, "\'") );
 	}
 
 	public void testMySQLStandardEncode()
 	{
-        	assertEquals( "\\<", mySQLCodecStandard.encode(EMPTY_CHAR_ARRAY, "<") );
+		// TODO
+		//
+		//assertEquals( "\\<", mySQLCodecStandard.encode(EMPTY_CHAR_ARRAY, "<") );
 	}
 
 	public void testOracleEncode()
 	{
-        	assertEquals( "\'\'", oracleCodec.encode(EMPTY_CHAR_ARRAY, "\'") );
+		// TODO - need CSS encoding functions
+		//
+		//assertEquals( "\'\'", oracleCodec.encode(EMPTY_CHAR_ARRAY, "\'") );
 	}
 
 	public void testUnixEncode()
 	{
-        	assertEquals( "\\<", unixCodec.encode(EMPTY_CHAR_ARRAY, "<") );
+        	//assertEquals( "\\<", unixCodec.encode(EMPTY_CHAR_ARRAY, "<") );
 	}
 
 	public void testWindowsEncode()
 	{
-        	assertEquals( "^<", windowsCodec.encode(EMPTY_CHAR_ARRAY, "<") );
+        	//assertEquals( "^<", windowsCodec.encode(EMPTY_CHAR_ARRAY, "<") );
 	}
 
 	
 	public void testHtmlEncodeChar()
 	{
-        	assertEquals( "&lt;", htmlCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
+        	//assertEquals( "&lt;", htmlCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
 	}
 
 	public void testHtmlEncodeChar0x100()
@@ -147,7 +143,7 @@ public class CodecTest extends TestCase {
 		String expected = "&#x100;";
 		String result;
 
-        	result = htmlCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
+        	result = Encoder.encodeForHTML( in + "");
 		// this should be escaped
         	assertFalse(inStr.equals(result));
 		// UTF-8 encoded and then percent escaped
@@ -161,7 +157,7 @@ public class CodecTest extends TestCase {
 		String expected = "&#x100;";
 		String result;
 
-        	result = htmlCodec.encode(EMPTY_CHAR_ARRAY, inStr);
+        	result = Encoder.encodeForHTML( inStr);
 		// this should be escaped
         	assertFalse(inStr.equals(result));
 		// UTF-8 encoded and then percent escaped
@@ -170,7 +166,7 @@ public class CodecTest extends TestCase {
 
 	public void testPercentEncodeChar()
 	{
-        	assertEquals( "%3C", percentCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
+        	assertEquals( "%3C", Encoder.encodeForURI( "<" ));
 	}
 
 	public void testPercentEncodeChar0x100()
@@ -180,7 +176,7 @@ public class CodecTest extends TestCase {
 		String expected = "%C4%80";
 		String result;
 
-        	result = percentCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
+        	result = Encoder.encodeForURI( in + "");
 		// this should be escaped
         	assertFalse(inStr.equals(result));
 		// UTF-8 encoded and then percent escaped
@@ -194,7 +190,7 @@ public class CodecTest extends TestCase {
 		String expected = "%C4%80";
 		String result;
 
-        	result = percentCodec.encode(EMPTY_CHAR_ARRAY, inStr);
+        	result = Encoder.encodeForURI(inStr);
 		// this should be escaped
         	assertFalse(inStr.equals(result));
 		// UTF-8 encoded and then percent escaped
@@ -203,7 +199,7 @@ public class CodecTest extends TestCase {
 
 	public void testJavaScriptEncodeChar()
 	{
-        	assertEquals( "\\x3C", javaScriptCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
+        	assertEquals( "\\x3C", Encoder.encodeForJavascript("<"));
 	}
 
 	public void testJavaScriptEncodeChar0x100()
@@ -213,7 +209,7 @@ public class CodecTest extends TestCase {
 		String expected = "\\u0100";
 		String result;
 
-        	result = javaScriptCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
+        	result = Encoder.encodeForJavascript( in + "");
 		// this should be escaped
         	assertFalse(inStr.equals(result));
         	assertEquals(expected,result);
@@ -226,65 +222,41 @@ public class CodecTest extends TestCase {
 		String expected = "\\u0100";
 		String result;
 
-        	result = javaScriptCodec.encode(EMPTY_CHAR_ARRAY, inStr);
+        	result = Encoder.encodeForJavascript(inStr);
 		// this should be escaped
         	assertFalse(inStr.equals(result));
         	assertEquals(expected,result);
 	}
         
-	public void testVBScriptEncodeChar()
-	{
-        	assertEquals( "chrw(60)", vbScriptCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
-	}
-
-	public void testVBScriptEncodeChar0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		// FIXME I don't know vb...
-		// String expected = "\\u0100";
-		String result;
-
-        	result = vbScriptCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	//assertEquals(expected,result);
-	}
-
-	public void testVBScriptEncodeStr0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		// FIXME I don't know vb...
-		// String expected = "chrw(0x100)";
-		String result;
-
-        	result = vbScriptCodec.encode(EMPTY_CHAR_ARRAY, inStr);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	// assertEquals(expected,result);
-	}
 
 	public void testCSSEncodeChar()
 	{
-        	assertEquals( "\\3c ", cssCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
+        //TODO
+		//assertEquals( "\\3c ", cssCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
 	}
 
 	public void testCSSEncodeChar0x100()
 	{
+		/*
+		 * TODO
+		 * 
+		 * 
 		char in = 0x100;
 		String inStr = Character.toString(in);
 		String expected = "\\100 ";
 		String result;
 
-        	result = cssCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
+        result = cssCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
 		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	assertEquals(expected,result);
+        assertFalse(inStr.equals(result));
+        assertEquals(expected,result);
+        *
+        */
 	}
 
 	public void testCSSEncodeStr0x100()
 	{
+		/*
 		char in = 0x100;
 		String inStr = Character.toString(in);
 		String expected = "\\100 ";
@@ -294,111 +266,10 @@ public class CodecTest extends TestCase {
 		// this should be escaped
         	assertFalse(inStr.equals(result));
         	assertEquals(expected,result);
+        	*/
 	}
 
-	public void testMySQLANSIEncodeChar()
-	{
-        	assertEquals( "\'\'", mySQLCodecANSI.encodeCharacter(EMPTY_CHAR_ARRAY, SINGLE_QUOTE));
-	}
-
-	public void testMySQLStandardEncodeChar0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		String expected = "\\" + in;
-		String result;
-
-        	result = mySQLCodecStandard.encodeCharacter(EMPTY_CHAR_ARRAY, in);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	assertEquals(expected,result);
-	}
-
-	public void testMySQLStandardEncodeStr0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		String expected = "\\" + in;
-		String result;
-
-        	result = mySQLCodecStandard.encode(EMPTY_CHAR_ARRAY, inStr);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	assertEquals(expected,result);
-	}
-
-	public void testMySQLStandardEncodeChar()
-	{
-        	assertEquals( "\\<", mySQLCodecStandard.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
-	}
-
-	public void testOracleEncodeChar()
-	{
-        	assertEquals( "\'\'", oracleCodec.encodeCharacter(EMPTY_CHAR_ARRAY, SINGLE_QUOTE) );
-	}
-
-	public void testUnixEncodeChar()
-	{
-        	assertEquals( "\\<", unixCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
-	}
-
-	public void testUnixEncodeChar0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		String expected = "\\" + in;
-		String result;
-
-        	result = unixCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	assertEquals(expected,result);
-	}
-
-	public void testUnixEncodeStr0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		String expected = "\\" + in;
-		String result;
-
-        	result = unixCodec.encode(EMPTY_CHAR_ARRAY, inStr);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	assertEquals(expected,result);
-	}
-
-	public void testWindowsEncodeChar()
-	{
-        	assertEquals( "^<", windowsCodec.encodeCharacter(EMPTY_CHAR_ARRAY, LESS_THAN) );
-	}
-
-	public void testWindowsEncodeChar0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		String expected = "^" + in;
-		String result;
-
-        	result = windowsCodec.encodeCharacter(EMPTY_CHAR_ARRAY, in);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	assertEquals(expected,result);
-	}
-
-	public void testWindowsEncodeStr0x100()
-	{
-		char in = 0x100;
-		String inStr = Character.toString(in);
-		String expected = "^" + in;
-		String result;
-
-        	result = windowsCodec.encode(EMPTY_CHAR_ARRAY, inStr);
-		// this should be escaped
-        	assertFalse(inStr.equals(result));
-        	assertEquals(expected,result);
-	}
-	
+	/*
 	public void testHtmlDecodeDecimalEntities()
 	{
         	assertEquals( "test!", htmlCodec.decode("&#116;&#101;&#115;&#116;!") );
@@ -587,38 +458,5 @@ public class CodecTest extends TestCase {
         	assertEquals( LESS_THAN, javaScriptCodec.decodeCharacter(new PushbackString("\\x3c") ));
 	}
         
-	public void testVBScriptDecodeChar()
-	{
-        	assertEquals( LESS_THAN, vbScriptCodec.decodeCharacter(new PushbackString("\"<") ));
-	}
-
-	public void testCSSDecodeCharBackSlashHex()
-	{
-        	assertEquals( LESS_THAN, cssCodec.decodeCharacter(new PushbackString("\\3c") ));
-	}
-
-	public void testMySQLANSIDecodCharQuoteQuote()
-	{
-        	assertEquals( SINGLE_QUOTE, mySQLCodecANSI.decodeCharacter(new PushbackString("\'\'") ));
-	}
-
-        public void testMySQLStandardDecodeCharBackSlashLessThan()
-	{
-        	assertEquals( LESS_THAN, mySQLCodecStandard.decodeCharacter(new PushbackString("\\<") ));
-	}
-
-	public void testOracleDecodeCharBackSlashLessThan()
-	{
-        	assertEquals( SINGLE_QUOTE, oracleCodec.decodeCharacter(new PushbackString("\'\'") ));
-	}
-
-        public void testUnixDecodeCharBackSlashLessThan()
-	{
-        	assertEquals( LESS_THAN, unixCodec.decodeCharacter(new PushbackString("\\<") ));
-	}
-
-        public void testWindowsDecodeCharCarrotLessThan()
-	{
-        	assertEquals( LESS_THAN, windowsCodec.decodeCharacter(new PushbackString("^<") ));
-	}
+*/
 }
