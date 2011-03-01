@@ -49,24 +49,47 @@ import java.util.Map;
  * String output = Encoder.XML.apply(input);
  * </pre>
  * 
- * Several variations on the escaping API exist. See class JavaDoc for full
+ * or
+ * 
+ * <pre>
+ * String output = Encoder.encodeForXML(input);
+ * </pre>
+ * 
+ * Several additional variations on the escaping API exist. See class JavaDoc for full
  * details.
  * 
  * @author Jeffrey Ichnowski
  * @version $Revision: 8 $
  */
 public abstract class Encoder {
-	
-	/*
+		
+	/**
 	 * 
-	 * Helper functions
+	 * These are functions that we need to support eventually	
 	 * 
 	 */
 	
-	public final static String encodeForJavaString(String input) {
-		return Encoder.JAVA_STRING.apply(input);
-	}
+	//this should auto-detect the OS and encode appropriately
+	String encodeForOS(String input) {return "";}
 	
+	//these should get pushed to a new class. LDAPEncoder?
+	String encodeForLDAP(String input) {return "";}
+	String encodeForDN(String input) {return "";}
+	
+	//Do we need the OWASP-java-security-exception library?
+	//String decodeFromURL(String input) throws EncodingException {return "";}
+	
+	//I think we need more XPATH encoding functions to get this right
+	String encodeForXPath(String input) {return "";}
+
+	//Needed for encryption storage
+	String encodeForBase64(byte[] input, boolean wrap) {return "";}
+	byte[] decodeFromBase64(String input) throws IOException {return new byte[0];}
+
+	/**
+	 * These are the ESAPI-like functions that we support already
+	 * 
+	 */
 	public final static String encodeForHTML(String input) {
 		return Encoder.XML_CONTENT.apply(input);
 	}
@@ -91,7 +114,7 @@ public abstract class Encoder {
 		return Encoder.XML_COMMENT.apply(input);
 	}
 	
-	public final static String encodeForXML_CDATA(String input) {
+	public final static String encodeForXMLCDATA(String input) {
 		return Encoder.CDATA.apply(input);
 	}
 	
@@ -115,6 +138,13 @@ public abstract class Encoder {
 		return Encoder.SCRIPT_CODE.apply(input);
 	}
 
+	
+	/**
+	 * 
+	 * This is the core functionality for all encoding
+	 * 
+	 */
+	
 	// TODO: some serious performance clean up... Writing to the
 	// Appendables one char at a time can be really slow. Use
 	// ThreadLocal buffers or something.
