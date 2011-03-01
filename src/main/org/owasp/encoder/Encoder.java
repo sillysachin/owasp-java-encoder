@@ -56,6 +56,64 @@ import java.util.Map;
  * @version $Revision: 8 $
  */
 public abstract class Encoder {
+	
+	/*
+	 * 
+	 * Helper functions
+	 * 
+	 */
+	
+	public final static String encodeForJavaString(String input) {
+		return Encoder.JAVA_STRING.apply(input);
+	}
+	
+	public final static String encodeForHTML(String input) {
+		return Encoder.XML_CONTENT.apply(input);
+	}
+	
+	public final static String encodeForHTMLAttribute(String input) {
+		return Encoder.XML.apply(input);
+	}
+	
+	public final static String encodeForHTMLComment(String input) {
+		return Encoder.XML_COMMENT.apply(input);
+	}
+
+	public final static String encodeForXML(String input) {
+		return Encoder.XML_CONTENT.apply(input);
+	}
+	
+	public final static String encodeForXMLAttribute(String input) {
+		return Encoder.XML.apply(input);
+	}
+	
+	public final static String encodeForXMLComment(String input) {
+		return Encoder.XML_COMMENT.apply(input);
+	}
+	
+	public final static String encodeForXML_CDATA(String input) {
+		return Encoder.CDATA.apply(input);
+	}
+	
+	public final static String encodeForJavascript(String input) {
+		return Encoder.JAVASCRIPT.apply(input);
+	}
+	
+	public final static String encodeForURIComponent(String input) {
+		return Encoder.URI_COMPONENT.apply(input);
+	}
+	
+	public final static String encodeForURI(String input) {
+		return Encoder.URI.apply(input);
+	}
+
+	
+	//
+	// TODO: Fix this name
+	//
+	public final static String encodeForScriptCode(String input) {
+		return Encoder.SCRIPT_CODE.apply(input);
+	}
 
 	// TODO: some serious performance clean up... Writing to the
 	// Appendables one char at a time can be really slow. Use
@@ -166,9 +224,6 @@ public abstract class Encoder {
 		}
 	};
 
-	public final static String encodeForXML(String input) {
-		return Encoder.XML.apply(input);
-	}
 
 	/**
 	 * Escaping for a Java String. This replaces newlines with "\n", tabs with
@@ -219,10 +274,6 @@ public abstract class Encoder {
 		}
 	};
 
-	public final static String encodeForJavaString(String input) {
-		return Encoder.JAVA_STRING.apply(input);
-	}
-
 	/**
 	 * Escaping for CDATA sections. CDATA sections allow most content through
 	 * without escaping, however a "]]&gt;" tag in the middle of it will
@@ -270,10 +321,6 @@ public abstract class Encoder {
 			return buf;
 		}
 	};
-
-	public final static String encodeForXML_CDATA(String input) {
-		return Encoder.CDATA.apply(input);
-	}
 
 	/**
 	 * Escaping for JavaScript strings. Similar to JAVA_STRING. Note, this does
@@ -335,10 +382,6 @@ public abstract class Encoder {
 		}
 	};
 
-	public final static String encodeForJavascript(String input) {
-		return Encoder.JAVASCRIPT.apply(input);
-	}
-
 	/**
 	 * Escaping for a XHTML &lt;script&gt; block. Inside a script block, the
 	 * sequence "&lt;/" is likely to cause the script block to be prematurely
@@ -362,13 +405,6 @@ public abstract class Encoder {
 			return buf;
 		}
 	};
-
-	//
-	// TODO: Fix this name
-	//
-	public final static String encodeForScriptCode(String input) {
-		return Encoder.SCRIPT_CODE.apply(input);
-	}
 
 	/**
 	 * Encodes a Uniform Resource Identifier (URI) component by replacing each
@@ -597,10 +633,6 @@ public abstract class Encoder {
 			return buf;
 		}
 	}
-
-	public final static String encodeForURIComponent(String input) {
-		return Encoder.URI_COMPONENT.apply(input);
-	}
 	
 	/**
 	 * Encodes a Uniform Resource Identifier (URI) by replacing each instance of
@@ -657,10 +689,6 @@ public abstract class Encoder {
 		}
 	}
 	
-	public final static String encodeForURI(String input) {
-		return Encoder.URI.apply(input);
-	}
-
 
 	/** The name of the escape */
 	private String _name;
