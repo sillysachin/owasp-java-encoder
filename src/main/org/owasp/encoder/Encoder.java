@@ -70,26 +70,48 @@ public abstract class Encoder {
 	 */
 	
 	//this should auto-detect the OS and encode appropriately
-	String encodeForOS(String input) {return "";}
+	public static String encodeForOS(String input) {return "";}
 	
 	//these should get pushed to a new class. LDAPEncoder?
-	String encodeForLDAP(String input) {return "";}
-	String encodeForDN(String input) {return "";}
+	public static String encodeForLDAP(String input) {return "";}
+	public static String encodeForDN(String input) {return "";}
 	
 	//Do we need the OWASP-java-security-exception library?
 	//String decodeFromURL(String input) throws EncodingException {return "";}
 	
 	//I think we need more XPATH encoding functions to get this right
-	String encodeForXPath(String input) {return "";}
-
-	//Needed for encryption storage
-	String encodeForBase64(byte[] input, boolean wrap) {return "";}
-	byte[] decodeFromBase64(String input) throws IOException {return new byte[0];}
+	public static String encodeForXPath(String input) {return "";}
 
 	/**
 	 * These are the ESAPI-like functions that we support already
 	 * 
 	 */
+	
+	public static String encodeForBase64(String input) {
+		if ( input == null ) {
+			return null;
+		}
+		return encodeForBase64(input.getBytes(), true);
+	}
+	
+	public static String encodeForBase64(byte[] input, boolean wrap) {
+		if ( input == null ) {
+			return null;
+		}
+		int options = 0;
+		if ( !wrap ) {
+			options |= Base64.DONT_BREAK_LINES;
+		}
+		return Base64.encodeBytes(input, options);
+	}
+
+	public byte[] decodeFromBase64(String input) throws IOException {
+		if ( input == null ) {
+			return null;
+		}
+		return Base64.decode( input );
+	}
+	
 	public final static String encodeForHTML(String input) {
 		return Encoder.XML_CONTENT.apply(input);
 	}
