@@ -1,4 +1,4 @@
-// Copyright (c) 2010 Jeff Ichnowski
+// Copyright (c) 2012 Jeff Ichnowski
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
