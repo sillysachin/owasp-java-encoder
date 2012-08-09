@@ -38,7 +38,11 @@ import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 
 /**
- * CSSEncoder -- Encoder for Cascading-Style-Sheet based contexts.
+ * CSSEncoder -- Encoder for Cascading-Style-Sheet string and URI contexts.
+ * Other contexts, such as color, number (w/unit), etc... are not good targets
+ * for "encoding" (e.g. you cannot encode the string "XYZ" into a number),
+ * they should instead by validated through other means (such as regular
+ * expressions).
  */
 class CSSEncoder extends Encoder {
 

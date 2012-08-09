@@ -87,6 +87,7 @@ class HTMLEncoder extends Encoder {
         final int n = off+len;
         for (int i=off ; i<n ; ++i) {
             final char ch = input.charAt(i);
+
             switch (ch) {
             case '\t': case '\r': case '\f': case '\n': case ' ': case Unicode.NEL:
             case '\"': case '\'':
@@ -165,6 +166,14 @@ class HTMLEncoder extends Encoder {
     charLoop:
         for ( ; i<n ; ++i) {
             final char ch = in[i];
+
+            // gigantic switch, hopefully compiled to a tableswitch.
+            // this approach appears to be slower than the if/else
+            // approach used in the other encoders.  Perhaps an artifact
+            // of the CPU's branch predictor, or possible additional
+            // overhead of range checking, or having the entire table
+            // available to the cache.  If time allows, it would
+            // interesting to find out.
             switch (ch) {
             case '\t':
                 if (j+SINGLE_DIGIT_ENCODE_LENGTH > m) {
@@ -235,16 +244,20 @@ class HTMLEncoder extends Encoder {
             case '!': case '#': case '$': case '%':
             case '(': case ')': case '*': case '+':
             case ',': case '-': case '.':
+
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
             case ':': case ';': case '?': case '@':
+
             case 'A': case 'B': case 'C': case 'D': case 'E':
             case 'F': case 'G': case 'H': case 'I': case 'J':
             case 'K': case 'L': case 'M': case 'N': case 'O':
             case 'P': case 'Q': case 'R': case 'S': case 'T':
             case 'U': case 'V': case 'W': case 'X': case 'Y':
             case 'Z':
+
             case '[': case '\\': case ']': case '^': case '_':
+
             case 'a': case 'b': case 'c': case 'd': case 'e':
             case 'f': case 'g': case 'h': case 'i': case 'j':
             case 'k': case 'l': case 'm': case 'n': case 'o':

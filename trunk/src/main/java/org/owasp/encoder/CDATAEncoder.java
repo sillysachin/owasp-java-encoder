@@ -38,9 +38,17 @@ import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 
 /**
- * CDATAEncoder -- encoder for CDATA sections.  Removes invalid XML
- * characters, and encodes "{@code ]]>}" to avoid unexpected closing of the CDATA
- * section.
+ * CDATAEncoder -- encoder for CDATA sections.  CDATA sections are generally
+ * good for including large blocks of text that contain characters that
+ * normally require encoding (ampersand, quotes, less-than, etc...).  The
+ * CDATA context however still does not allow invalid characters, and can
+ * be closed by the sequence "]]>".  This encoder removes invalid XML
+ * characters, and encodes "]]>" (to "]]>]]&lt;![CDATA[>").  The result is
+ * that the data integrity is maintained, but the code receiving the output
+ * will have to handle multiple CDATA events with character events between.
+ * As an alternate approach, the caller could pre-encode "]]>" to something
+ * of their choosing (e.g. data.replaceAll("\\]\\]>", "]] >")), then use
+ * this encoder to remove any invalid XML characters.
  *
  * @author Jeff Ichnowski
  */
