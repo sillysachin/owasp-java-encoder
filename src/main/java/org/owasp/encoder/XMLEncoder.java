@@ -38,10 +38,14 @@ import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 
 /**
- * XMLEncoder -- An encoder for XML contexts that use entity encoding
- * ("&amp"-encoding).
- *
- * Created: 12/6/11
+ * XMLEncoder -- encoder for XML attribute and content data.  It uses XML
+ * entity entity ("&amp;...;") to encode valid but significant characters.
+ * Characters that are invalid according to the XML specification are
+ * replaced by a space character (U+0020).  This encoder supports several
+ * modes of operation, allowing for varying contexts, such as: attribute
+ * data between single-quotes, attribute data between double-quotes,
+ * attribute data with indeterminate quotes, content, or a context safe for
+ * all of the above.
  *
  * @author jeffi
  */

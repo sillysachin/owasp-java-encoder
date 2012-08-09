@@ -38,7 +38,13 @@ import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 
 /**
- * JavaEncoder -- an encoder for Java string contexts.
+ * JavaEncoder -- Encoder for Java based strings.  Useful if in Java code
+ * generators to generate efficiently encoded strings for arbitrary data.
+ * This encoder uses the minimal sequence of characters required to encode
+ * a character (e.g. standard backslash escapes, such as "\n", "\\" , "\'",
+ * octal escapes, and unicode escapes).  This encoder does NOT check UTF-16
+ * surrogate pair sequences.  The target output context supports mismatched
+ * UTF-16 pairs (e.g. it will compile, run, etc... with them).
  *
  * @author Jeff Ichnowski
  */
