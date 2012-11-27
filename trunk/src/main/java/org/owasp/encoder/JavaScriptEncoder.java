@@ -164,7 +164,8 @@ class JavaScriptEncoder extends Encoder {
             if (ch >= ' ') {
                 if (ch == '\\' || ch == '\'' || ch == '\"' ||
                     (ch == '/' && _escapeForwardSlash) ||
-                    (ch > _upperValid))
+                    (ch > _upperValid) ||
+                    (ch == '&' && _mode != Mode.SOURCE))
                 {
                     return i;
                 }
@@ -210,6 +211,11 @@ class JavaScriptEncoder extends Encoder {
                         out[j++] = '\\';
                         out[j++] = ch;
                     }
+                } else if (ch == '&' && _mode != Mode.SOURCE) {
+                    out[j++] = '\\';
+                    out[j++] = 'x';
+                    out[j++] = '2'; //HEX[ch >>> HEX_SHIFT];
+                    out[j++] = '6'; //HEX[ch & HEX_MASK];
                 } else {
                     if (j >= m) {
                         return overflow(input, i, output, j);
