@@ -37,6 +37,7 @@ package org.owasp.encoder;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.owasp.encoder.JavaScriptEncoder.Mode;
 
 /**
  * JavaScriptEncoderTest -- test suite for the JavaScriptEncoder.
@@ -80,6 +81,9 @@ public class JavaScriptEncoderTest extends TestCase {
                 default:
                     builder.encode("/", "/");
                     break;
+                }
+                if (mode != Mode.SOURCE) {
+                    builder.encoded("&");
                 }
 
                 builder
