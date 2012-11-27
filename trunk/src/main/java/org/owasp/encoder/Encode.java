@@ -459,6 +459,11 @@ public final class Encode {
      *       "\&amp;quot;".)</td>
      *     </tr>
      *     <tr>
+     *       <td>U+0026</td><td><code>&</code></td>
+     *       <td><code>\x26</code></td>
+     *       <td>Ampersand character</td>
+     *     </tr>
+     *     <tr>
      *       <td>U+0027</td><td><code>'</code></td>
      *       <td><code>\x27</code></td>
      *       <td>The encoding <code>\'</code> is not used here because
@@ -560,8 +565,8 @@ public final class Encode {
      * use in ANY context embedded in HTML.</strong> The caller must
      * provide the surrounding quotation characters.  This method
      * performs the same encode as {@link #forJavaScript(String)} with
-     * the exception that <code>/</code> is not escaped, and
-     * <code>"</code> and <code>'</code> are encoded as
+     * the exception that <code>/</code> and <code>&amp;</code> are not
+     * escaped and <code>"</code> and <code>'</code> are encoded as
      * <code>\"</code> and <code>\'</code> respectively.</p>
      *
      * <p><strong>Unless you are interested in saving a few bytes of
