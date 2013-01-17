@@ -48,6 +48,12 @@
         </license>
     </licenses>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <scm>
         <developerConnection>scm:svn:https://owasp-java-encoder.googlecode.com/svn/trunk/</developerConnection>
         <connection>scm:svn:http://owasp-java-encoder.googlecode.com/svn/trunk/</connection>
