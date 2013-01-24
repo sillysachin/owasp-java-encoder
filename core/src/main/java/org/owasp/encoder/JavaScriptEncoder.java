@@ -120,11 +120,21 @@ class JavaScriptEncoder extends Encoder {
      */
     private final boolean _escapeForwardSlash;
     /**
-     * The maximum valid character to leave unencoded.  When encoding
-     * for ASCII output, this will be the highest ASCII character,
-     * otherwise it will be the maximum Character value.
+     * This value, along with {@link #_uEncodedInvalidMax} defines an
+     * invalid range in the \\u encoded block.  When encoding for ASCII
+     * this range is effectively all of Unicode.  When not encoding for
+     * ASCII, this range is the range that includes the line and paragraph
+     * separator characters.
      */
-    private final char _upperValid;
+    private final char _uEncodedInvalidMin;
+    /**
+     * This value, along with {@link #_uEncodedInvalidMin} defines an
+     * invalid range in the \\u encoded block.  When encoding for ASCII
+     * this range is effectively all of Unicode.  When not encoding for
+     * ASCII, this range is the range that includes the line and paragraph
+     * separator characters.
+     */
+    private final char _uEncodedInvalidMax;
 
     /**
      * Default constructor--equivalent to
@@ -146,14 +156,16 @@ class JavaScriptEncoder extends Encoder {
         _mode = mode;
         _hexEncodeQuotes = (mode == Mode.ATTRIBUTE || mode == Mode.HTML);
         _escapeForwardSlash = (mode == Mode.BLOCK || mode == Mode.HTML);
-        _upperValid = asciiOutput ? Unicode.MAX_ASCII : Character.MAX_VALUE;
+
+        _uEncodedInvalidMin = asciiOutput ? (Unicode.MAX_ASCII+1) : Unicode.LINE_SEPARATOR;
+        _uEncodedInvalidMax = asciiOutput ? Character.MAX_VALUE : Unicode.PARAGRAPH_SEPARATOR;
     }
 
     @Override
     protected int maxEncodedLength(int n) {
-        // if _asciiOutput is enabled, unicode escapes (\u1234) will be included
-        // otherwise only hex escapes (\x03) are used
-        return _upperValid == Unicode.MAX_ASCII ? n * CHARS_PER_U_ESCAPE : n * CHARS_PER_HEX_ESCAPE;
+        // Because of LINE_SEPARATOR and PARAGRAPH_SEPARATOR a unicode
+        // escape might be required.
+        return n * CHARS_PER_U_ESCAPE;
     }
 
     @Override
@@ -164,7 +176,7 @@ class JavaScriptEncoder extends Encoder {
             if (ch >= ' ') {
                 if (ch == '\\' || ch == '\'' || ch == '\"' ||
                     (ch == '/' && _escapeForwardSlash) ||
-                    (ch > _upperValid) ||
+                    (ch >= _uEncodedInvalidMin && ch <= _uEncodedInvalidMax) ||
                     (ch == '&' && _mode != Mode.SOURCE))
                 {
                     return i;
@@ -188,7 +200,7 @@ class JavaScriptEncoder extends Encoder {
 
         for ( ; i<n ; ++i) {
             char ch = in[i];
-            if (ch >= ' ' && ch <= _upperValid) {
+            if (ch >= ' ' && ch < _uEncodedInvalidMin || ch > _uEncodedInvalidMax) {
                 if (ch == '\\' || (ch == '/' && _escapeForwardSlash)) {
                     if (j+2 > m) {
                         return overflow(input, i, output, j);
@@ -299,6 +311,6 @@ class JavaScriptEncoder extends Encoder {
 
     @Override
     public String toString() {
-        return "JavaScriptEncoder(mode="+_mode+","+(_upperValid == Unicode.MAX_ASCII ?"ASCII":"UNICODE")+")";
+        return "JavaScriptEncoder(mode="+_mode+","+(_uEncodedInvalidMax == Character.MAX_VALUE ?"ASCII":"UNICODE")+")";
     }
 }
