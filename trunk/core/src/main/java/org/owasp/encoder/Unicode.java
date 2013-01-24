@@ -56,6 +56,16 @@ final class Unicode {
     static final char MAX_C1_CTRL_CHAR = 0x9f;
 
 
+    /**
+     * Unicode line separator character, must be encoded in some contexts.
+     */
+    static final char LINE_SEPARATOR = '\u2028';
+    /**
+     * Unicode paragraph separator character, must be encoded in some contexts.
+     */
+    static final char PARAGRAPH_SEPARATOR = '\u2029';
+
+
     /** Bit-mask for Unicode non-characaters (XXfffe and XXffff). */
     static final int NON_CHAR_MASK = 0xfffe;
 

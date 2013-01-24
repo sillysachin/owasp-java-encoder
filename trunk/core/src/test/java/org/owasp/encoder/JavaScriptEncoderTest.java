@@ -95,6 +95,8 @@ public class JavaScriptEncoderTest extends TestCase {
                     .encode("FF", "\\f", "\f")
                     .encode("CR", "\\r", "\r")
                     .encode("NUL", "\\x00", "\0")
+                    .encode("Line Separator", "\\u2028", "\u2028")
+                    .encode("Paragraph Separator", "\\u2029", "\u2029")
                     .encode("abc", "abc")
                     .encode("ABC", "ABC");
 
@@ -102,7 +104,8 @@ public class JavaScriptEncoderTest extends TestCase {
                     builder
                         .encode("unicode", "\u1234", "\u1234")
                         .encode("high-ascii", "\u00ff", "\u00ff")
-                        .valid(0x7f, Character.MAX_CODE_POINT);
+                        .valid(0x7f, Character.MAX_CODE_POINT)
+                        .encoded("\u2028\u2029");
                 } else {
                     builder
                         .encode("unicode", "\\u1234", "\u1234")
