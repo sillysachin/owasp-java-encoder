@@ -162,7 +162,7 @@ class CSSEncoder extends Encoder {
                 if ((ch < LONG_BITS ? _lowMask & (1L << ch) : _highMask & (1L << (ch - LONG_BITS))) != 0) {
                     continue;
                 }
-            } else if (ch > '\237') {
+            } else if (ch > '\237' && ch < Unicode.LINE_SEPARATOR || ch > Unicode.PARAGRAPH_SEPARATOR) {
                 // "nonascii"
                 if (ch < Character.MIN_HIGH_SURROGATE || ch > Character.MAX_LOW_SURROGATE) {
                     // valid
@@ -207,7 +207,7 @@ class CSSEncoder extends Encoder {
                     out[j++] = ch;
                     continue;
                 }
-            } else if (ch > '\237') {
+            } else if (ch > '\237' && ch < Unicode.LINE_SEPARATOR || ch > Unicode.PARAGRAPH_SEPARATOR) {
                 // "nonascii"
                 if (ch < Character.MIN_HIGH_SURROGATE || ch > Character.MAX_LOW_SURROGATE) {
                     if (j >= m) {

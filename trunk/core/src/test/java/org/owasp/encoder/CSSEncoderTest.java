@@ -61,6 +61,9 @@ public class CSSEncoderTest extends TestCase {
                 .valid('*', '~')
                 .encoded("\\")
                 .valid('\240', Character.MAX_CODE_POINT)
+                .encoded('\u2028', '\u2029')
+                .encode("Line Separator", "\\2028", "\u2028")
+                .encode("Paragraph Separator", "\\2029", "\u2029")
                 .invalid(Character.MIN_SURROGATE, Character.MAX_SURROGATE);
 
             switch (mode) {
