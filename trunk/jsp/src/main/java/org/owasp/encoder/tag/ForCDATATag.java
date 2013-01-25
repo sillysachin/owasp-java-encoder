@@ -47,6 +47,6 @@ import org.owasp.encoder.Encode;
 public class ForCDATATag extends EncodingTag {
     @Override
     public void doTag() throws JspException, IOException {
-        getJspContext().getOut().print(Encode.forCDATA(_value));
+        Encode.forCDATA(getJspContext().getOut(), _value);
     }
 }

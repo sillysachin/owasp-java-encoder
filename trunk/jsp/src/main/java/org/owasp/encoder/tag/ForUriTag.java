@@ -47,6 +47,6 @@ import org.owasp.encoder.Encode;
 public class ForUriTag extends EncodingTag {
     @Override
     public void doTag() throws JspException, IOException {
-        getJspContext().getOut().print(Encode.forUri(_value));
+        Encode.forUri(getJspContext().getOut(), _value);
     }
 }

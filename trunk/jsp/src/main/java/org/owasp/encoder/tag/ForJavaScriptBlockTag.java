@@ -47,6 +47,6 @@ import org.owasp.encoder.Encode;
 public class ForJavaScriptBlockTag extends EncodingTag {
     @Override
     public void doTag() throws JspException, IOException {
-        getJspContext().getOut().print(Encode.forJavaScriptBlock(_value));
+        Encode.forJavaScriptBlock(getJspContext().getOut(), _value);
     }
 }
