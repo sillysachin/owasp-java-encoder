@@ -34,6 +34,8 @@
 
 package org.owasp.encoder;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 
@@ -44,9 +46,14 @@ import java.nio.charset.CoderResult;
  *     &lt;input value="&lt;%=Encode.forHtml(value)%>" />
  * </pre>
  *
- * Please make sure to read and understand the context that the method encodes
+ * <p>There are two versions of each contextual encoding method.  The first
+ * takes a {@code String} argument and returns the encoded version as a
+ * {@code String}.  The second version writes the encoded version directly
+ * to a {@code Writer}.</p>
+ *
+ * <p>Please make sure to read and understand the context that the method encodes
  * for.  Encoding for the incorrect context will likely lead to exposing a
- * cross-site scripting vulnerability.
+ * cross-site scripting vulnerability.</p>
  *
  * @author Jeff Ichnowski
  */
@@ -144,6 +151,18 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forHtml(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forHtml(Writer out, String input) throws IOException {
+        forXml(out, input);
+    }
+
+    /**
      * <p>This method encodes for HTML text content.  It does not escape
      * quotation characters and is thus unsafe for use with
      * HTML attributes.  Use either forHtml or forHtmlAttribute for those
@@ -161,6 +180,20 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forHtmlContent(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forHtmlContent(Writer out, String input)
+        throws IOException
+    {
+        forXmlContent(out, input);
+    }
+
+    /**
      * <p>This method encodes for HTML text attributes.</p>
      *
      * <pre>
@@ -173,6 +206,21 @@ public final class Encode {
     public static String forHtmlAttribute(String input) {
         return forXmlAttribute(input);
     }
+
+    /**
+     * See {@link #forHtmlAttribute(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forHtmlAttribute(Writer out, String input)
+        throws IOException
+    {
+        forXmlAttribute(out, input);
+    }
+
 
     /**
      * <p>Encodes for unquoted HTML attribute values.  {@link
@@ -198,6 +246,21 @@ public final class Encode {
     public static String forHtmlUnquotedAttribute(String input) {
         return encode(Encoders.HTML_UNQUOTED_ATTRIBUTE_ENCODER, input);
     }
+
+    /**
+     * See {@link #forHtmlUnquotedAttribute(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forHtmlUnquotedAttribute(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.HTML_UNQUOTED_ATTRIBUTE_ENCODER, out, input);
+    }
+
 
     // HTML comment encoding is not currently supported because
     // of the number of vendor-specific sequences that would need
@@ -233,6 +296,20 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forCssString(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forCssString(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.CSS_STRING_ENCODER, out, input);
+    }
+
+    /**
      * Encodes for CSS URL contexts.  The context must be surrounded by {@code "url("}
      * and {@code ")"}.  It is safe for use in both style blocks and attributes in HTML.
      * Note: this does not do any checking on the quality or safety of the URL
@@ -255,6 +332,20 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forCssUrl(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forCssUrl(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.CSS_URL_ENCODER, out, input);
+    }
+
+    /**
      * Performs percent-encoding of a URL according to RFC 3986.  The provided
      * URL is assumed to a valid URL.  This method does not do any checking on
      * the quality or safety of the URL itself.  In many applications it may
@@ -268,6 +359,20 @@ public final class Encode {
      */
     public static String forUri(String input) {
         return encode(Encoders.URI_ENCODER, input);
+    }
+
+    /**
+     * See {@link #forUri(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forUri(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.URI_ENCODER, out, input);
     }
 
     /**
@@ -290,6 +395,20 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forUriComponent(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forUriComponent(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.URI_COMPONENT_ENCODER, out, input);
+    }
+
+    /**
      * Encoder for XML and XHTML.
      *
      * @see #forHtml(String) forHtml(string) for general description of context.
@@ -298,6 +417,20 @@ public final class Encode {
      */
     public static String forXml(String input) {
         return encode(Encoders.XML_ENCODER, input);
+    }
+
+    /**
+     * See {@link #forXml(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forXml(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.XML_ENCODER, out, input);
     }
 
     /**
@@ -312,6 +445,20 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forXmlContent(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forXmlContent(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.XML_CONTENT_ENCODER, out, input);
+    }
+
+    /**
      * Encoder for XML and XHTML attribute content.
      *
      * @see #forHtmlAttribute(String) forHtmlAttribute(String) for general description of context.
@@ -320,6 +467,20 @@ public final class Encode {
      */
     public static String forXmlAttribute(String input) {
         return encode(Encoders.XML_ATTRIBUTE_ENCODER, input);
+    }
+
+    /**
+     * See {@link #forXmlAttribute(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forXmlAttribute(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.XML_ATTRIBUTE_ENCODER, out, input);
     }
 
     /**
@@ -353,6 +514,20 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forXmlComment(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forXmlComment(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.XML_COMMENT_ENCODER, out, input);
+    }
+
+    /**
      * Encodes data for an XML CDATA section.  On the chance that the input
      * contains a terminating {@code "]]>"}, it will be replaced by
      * {@code "]]>]]<![CDATA[>"}.
@@ -369,6 +544,20 @@ public final class Encode {
      */
     public static String forCDATA(String input) {
         return encode(Encoders.CDATA_ENCODER, input);
+    }
+
+    /**
+     * See {@link #forCDATA(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forCDATA(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.CDATA_ENCODER, out, input);
     }
 
     /**
@@ -391,6 +580,20 @@ public final class Encode {
      */
     public static String forJava(String input) {
         return encode(Encoders.JAVA_ENCODER, input);
+    }
+
+    /**
+     * See {@link #forJava(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forJava(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.JAVA_ENCODER, out, input);
     }
 
     /**
@@ -502,6 +705,20 @@ public final class Encode {
     }
 
     /**
+     * See {@link #forJavaScript(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forJavaScript(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.JAVASCRIPT_ENCODER, out, input);
+    }
+
+    /**
      * <p>This method encodes for JavaScript strings contained within
      * HTML script attributes (such as {@code onclick}).  It is
      * NOT safe for use in script blocks.  The caller MUST provide the
@@ -526,6 +743,20 @@ public final class Encode {
      */
     public static String forJavaScriptAttribute(String input) {
         return encode(Encoders.JAVASCRIPT_ATTRIBUTE_ENCODER, input);
+    }
+
+    /**
+     * See {@link #forJavaScriptAttribute(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forJavaScriptAttribute(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.JAVASCRIPT_ATTRIBUTE_ENCODER, out, input);
     }
 
     /**
@@ -557,6 +788,20 @@ public final class Encode {
      */
     public static String forJavaScriptBlock(String input) {
         return encode(Encoders.JAVASCRIPT_BLOCK_ENCODER, input);
+    }
+
+    /**
+     * See {@link #forJavaScriptBlock(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forJavaScriptBlock(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.JAVASCRIPT_BLOCK_ENCODER, out, input);
     }
 
     /**
@@ -599,6 +844,20 @@ public final class Encode {
         return encode(Encoders.JAVASCRIPT_SOURCE_ENCODER, input);
     }
 
+    /**
+     * See {@link #forJavaScriptSource(String)} for description of encoding.  This
+     * version writes directly to a Writer without an intervening string.
+     *
+     * @param out where to write encoded output
+     * @param input the input string to encode
+     * @throws IOException if thrown by writer
+     */
+    public static void forJavaScriptSource(Writer out, String input)
+        throws IOException
+    {
+        encode(Encoders.JAVASCRIPT_SOURCE_ENCODER, out, input);
+    }
+
     // Additional?
     // MySQL
     // PostreSQL
@@ -638,6 +897,43 @@ public final class Encode {
     }
 
     /**
+     * Core encoding loop shared by public methods.  It first uses the
+     * encoder to scan the input for characters that need encoding.  If no
+     * characters require encoding, the input string is written directly to
+     * the writer.  Otherwise a thread-local buffer is used to encode the
+     * remainder of the input to the buffers.  This version saves a wrapping
+     * in an String.
+     *
+     * @param encoder the encoder to use
+     * @param out the writer for the encoded output
+     * @param str the string to encode
+     * @throws IOException if thrown by the writer
+     */
+    static void encode(Encoder encoder, Writer out, String str)
+        throws IOException
+    {
+        if (str == null) {
+            // consistent with String.valueOf(...) use "null" for null.
+            str = "null";
+        }
+
+        // quick pass--see if we need to actually encode anything, if not
+        // return the value unchanged.
+        final int n = str.length();
+        int j = encoder.firstEncodedOffset(str, 0, n);
+
+        if (j == n) {
+            out.write(str);
+            return;
+        }
+
+        // otherwise, we need to encode.  We use a thread-local buffer to avoid
+        // excessive memory allocation for these calls.  Note: this means that
+        // an encoder implementation must NEVER call this method internally.
+        _localBuffer.get().encode(encoder, out, str, j);
+    }
+
+    /**
      * A buffer used for encoding.  Stored as a thread-local to avoid repeated
      * allocation.
      */
@@ -665,8 +961,8 @@ public final class Encode {
         final CharBuffer _output = CharBuffer.allocate(OUTPUT_BUFFER_SIZE);
 
         /**
-         * The core encoding routine of this class.  It uses the input and
-         * output buffers to allow the encoders to work in reused arrays.
+         * The core String encoding routine of this class.  It uses the input
+         * and output buffers to allow the encoders to work in reuse arrays.
          * When the input and/or output exceeds the capacity of the reused
          * arrays, temporary ones are allocated and then discarded after
          * the encode is done.
@@ -729,6 +1025,68 @@ public final class Encode {
                 }
 
                 return new String(buffer.array(), 0, buffer.position());
+            }
+        }
+
+        /**
+         * The core Writer encoding routing of this class.  It uses the
+         * input and output buffers to allow the encoders to reuse arrays.
+         * Unlike the string version, this method will never allocate more
+         * memory, instead encoding is done in batches and flushed to the
+         * writer in batches as large as possible.
+         *
+         * @param encoder the encoder to use
+         * @param out where to write the encoded output
+         * @param str the string to encode
+         * @param j the position in the string at which the first character
+         * needs encoding.
+         * @throws IOException if thrown by the writer.
+         */
+        void encode(Encoder encoder, Writer out, String str, int j)
+            throws IOException
+        {
+            out.write(str, 0, j);
+
+            final int n = str.length();
+
+            _input.clear();
+            _output.clear();
+
+            final char[] inputArray = _input.array();
+            final char[] outputArray = _output.array();
+
+            for (;;) {
+                final int remainingInput = n - j;
+                final int startPosition = _input.position();
+                final int batchSize = Math.min(remainingInput, _input.remaining());
+                str.getChars(j, j+batchSize, inputArray, startPosition);
+
+                _input.limit(startPosition + batchSize);
+
+
+                for (;;) {
+                    CoderResult cr = encoder.encodeArrays(
+                        _input, _output, batchSize == remainingInput);
+
+                    if (cr.isUnderflow()) {
+                        // get next input batch
+                        break;
+                    }
+
+                    // else, output buffer full, flush and continue.
+                    out.write(outputArray, 0, _output.position());
+                    _output.clear();
+                }
+
+                j += _input.position() - startPosition;
+
+                if (j == n) {
+                    // done.  flush remaining output buffer and return
+                    out.write(outputArray, 0, _output.position());
+                    return;
+                }
+
+                _input.compact();
             }
         }
     }

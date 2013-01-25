@@ -47,6 +47,6 @@ import org.owasp.encoder.Encode;
 public class ForXmlCommentTag extends EncodingTag {
     @Override
     public void doTag() throws JspException, IOException {
-        getJspContext().getOut().print(Encode.forXmlComment(_value));
+        Encode.forXmlComment(getJspContext().getOut(), _value);
     }
 }

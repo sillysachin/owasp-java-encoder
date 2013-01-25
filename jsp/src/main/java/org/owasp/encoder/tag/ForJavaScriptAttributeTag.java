@@ -47,6 +47,6 @@ import org.owasp.encoder.Encode;
 public class ForJavaScriptAttributeTag extends EncodingTag {
     @Override
     public void doTag() throws JspException, IOException {
-        getJspContext().getOut().print(Encode.forJavaScriptAttribute(_value));
+        Encode.forJavaScriptAttribute(getJspContext().getOut(), _value);
     }
 }

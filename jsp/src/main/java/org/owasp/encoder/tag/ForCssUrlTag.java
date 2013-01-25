@@ -47,6 +47,6 @@ import org.owasp.encoder.Encode;
 public class ForCssUrlTag extends EncodingTag {
     @Override
     public void doTag() throws JspException, IOException {
-        getJspContext().getOut().print(Encode.forCssUrl(_value));
+        Encode.forCssUrl(getJspContext().getOut(), _value);
     }
 }
