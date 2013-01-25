@@ -52,10 +52,11 @@ import java.nio.charset.CoderResult;
  * @author Jeff Ichnowski
  */
 class HTMLEncoder extends Encoder {
-    /** Encoded length when two digits are required to escape an input. */
-    private static final int DOUBLE_DIGIT_ENCODE_LENGTH = 5;
-    /** Encoded length when 4 digits are required to escape the input. */
-    private static final int TRIPLE_DIGIT_ENCODE_LENGTH = 6;
+    /**
+     * Number of characters in the encoding prefix and suffix when using
+     * decimal numeric encodings of the form "&#...;".
+     */
+    private static final int ENCODE_AFFIX_CHAR_COUNT = 3;
 
     /** Encoding for '\t'. */
     private static final char[] TAB = "&#9;".toCharArray();
@@ -80,7 +81,9 @@ class HTMLEncoder extends Encoder {
 
     @Override
     int maxEncodedLength(int n) {
-        return n*TRIPLE_DIGIT_ENCODE_LENGTH;
+        // if everything is line separators and paragraph separators then
+        // we get "&#8283;"
+        return n*(ENCODE_AFFIX_CHAR_COUNT+4);
     }
 
     @Override
@@ -144,7 +147,8 @@ class HTMLEncoder extends Encoder {
                 if (ch <= Unicode.MAX_C1_CTRL_CHAR ||
                     Character.MIN_SURROGATE <= ch && ch <= Character.MAX_SURROGATE ||
                     ch > '\ufffd' ||
-                    ('\ufdd0' <= ch && ch <= '\ufdef'))
+                    ('\ufdd0' <= ch && ch <= '\ufdef') ||
+                    ch == Unicode.LINE_SEPARATOR || ch == Unicode.PARAGRAPH_SEPARATOR)
                 {
                     return i;
                 }
@@ -154,24 +158,44 @@ class HTMLEncoder extends Encoder {
     }
 
     /**
-     * Appends a source array verbatim to the output array, provided there
-     * is enough space left.  If the copy is successful, the new offset
-     * will be returned, otherwise {@code -j - 1} is returned.  Thus a failure
-     * will always be negative, including when {@code j} is 0.
+     * Appends a source array verbatim to the output array.  Caller must
+     * insure there is enough space in the array for the output.
      *
      * @param src the characters to copy
      * @param out the output buffer
      * @param j the offset where to write in the output buffer
-     * @param m the write limit
-     * @return {@code j + src.length} if successful, {@code -j -1} if not.
+     * @return {@code j + src.length}
      */
-    static int append(char[] src, char[] out, int j, int m) {
-        final int jAfter = j + src.length;
-        if (jAfter > m) {
-            return -j - 1;
-        }
+    static int append(char[] src, char[] out, int j) {
         System.arraycopy(src, 0, out, j, src.length);
-        return jAfter;
+        return j + src.length;
+    }
+
+    /**
+     * Appends the numerically encoded version of {@code codePoint} to the
+     * output buffer. Caller must insure there is enough space for the
+     * output.
+     *
+     * @param codePoint the character to encode
+     * @param out the output buffer
+     * @param j the offset where to write in the output buffer
+     * @return {@code j} + the encoded length.
+     */
+    static int encode(int codePoint, char[] out, int j) {
+        out[j++] = '&';
+        out[j++] = '#';
+        if (codePoint >= 1000) {
+            out[j++] = (char)(codePoint / 1000 % 10 + '0');
+        }
+        if (codePoint >= 100) {
+            out[j++] = (char)(codePoint / 100 % 10 + '0');
+        }
+        if (codePoint >= 10) {
+            out[j++] = (char)(codePoint / 10 % 10 + '0');
+        }
+        out[j++] = (char)(codePoint % 10 + '0');
+        out[j++] = ';';
+        return j;
     }
 
     @Override
@@ -198,55 +222,46 @@ class HTMLEncoder extends Encoder {
             // interesting to find out.
             switch (ch) {
             case '\t':
-                j = append(TAB, out, j, m);
-                if (j < 0) {
-                    return overflow(input, i, output, -j-1);
+                if (j + TAB.length > m) {
+                    return overflow(input, i, output, j);
                 }
+                j = append(TAB, out, j);
                 break;
 
             case '\r': case '\n': case '\f': case ' ': case '\"': case '\'':
             case '/': case '=': case '`':
-                if (j+DOUBLE_DIGIT_ENCODE_LENGTH > m) {
+                if (ENCODE_AFFIX_CHAR_COUNT+2+j > m) {
                     return overflow(input, i, output, j);
                 }
-                out[j++] = '&';
-                out[j++] = '#';
-                out[j++] = (char)(ch / 10 % 10 + '0');
-                out[j++] = (char)(ch % 10 + '0');
-                out[j++] = ';';
+                j = encode(ch, out, j);
                 break;
 
             case Unicode.NEL:
-                if (j+TRIPLE_DIGIT_ENCODE_LENGTH > m) {
+                if (ENCODE_AFFIX_CHAR_COUNT+3+j > m) {
                     return overflow(input, i, output, j);
                 }
-                out[j++] = '&';
-                out[j++] = '#';
-                out[j++] = (char)(ch / 100 % 10 + '0');
-                out[j++] = (char)(ch / 10 % 10 + '0');
-                out[j++] = (char)(ch % 10 + '0');
-                out[j++] = ';';
+                j = encode(ch, out, j);
                 break;
 
             case '&':
-                j = append(AMP, out, j, m);
-                if (j < 0) {
-                    return overflow(input, i, output, -j-1);
+                if (j + AMP.length > m) {
+                    return overflow(input, i, output, j);
                 }
+                j = append(AMP, out, j);
                 break;
 
             case '<':
-                j = append(LT, out, j, m);
-                if (j < 0) {
-                    return overflow(input, i, output, -j-1);
+                if (j + LT.length > m) {
+                    return overflow(input, i, output, j);
                 }
+                j = append(LT, out, j);
                 break;
 
             case '>':
-                j = append(GT, out, j, m);
-                if (j < 0) {
-                    return overflow(input, i, output, -j-1);
+                if (j + GT.length > m) {
+                    return overflow(input, i, output, j);
                 }
+                j = append(GT, out, j);
                 break;
 
             case '!': case '#': case '$': case '%':
@@ -314,6 +329,11 @@ class HTMLEncoder extends Encoder {
                 {
                     // invalid
                     out[j++] = '-';
+                } else if (ch == Unicode.LINE_SEPARATOR || ch == Unicode.PARAGRAPH_SEPARATOR) {
+                    if (ENCODE_AFFIX_CHAR_COUNT+4+j > m) {
+                        return overflow(input, i, output, j);
+                    }
+                    j = encode(ch, out, j);
                 } else {
                     out[j++] = ch;
                 }
