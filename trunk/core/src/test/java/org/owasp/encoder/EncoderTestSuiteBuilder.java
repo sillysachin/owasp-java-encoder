@@ -160,7 +160,7 @@ public class EncoderTestSuiteBuilder {
     }
 
     /**
-     * Extended version of {@link junit.framework.Assert.assertEquals(String,String)}.
+     * Extended version of {@link junit.framework.Assert#assertEquals(String,String)}.
      * It will try encodings by surrounding the input with safe and unsafe
      * prefixes and suffixes.  It will also check additional assertions about
      * the behavior of the encoders.
