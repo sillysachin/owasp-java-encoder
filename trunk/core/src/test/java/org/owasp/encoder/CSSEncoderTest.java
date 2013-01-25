@@ -57,7 +57,7 @@ public class CSSEncoderTest extends TestCase {
                 .encode("DEL", "\\7f", "\u007f")
 
                 .encoded(0, '\237')
-                .valid("!#$%&")
+                .valid("!#$%")
                 .valid('*', '~')
                 .encoded("\\")
                 .valid('\240', Character.MAX_CODE_POINT)
@@ -78,7 +78,7 @@ public class CSSEncoderTest extends TestCase {
             }
 
             suite.addTest(builder
-                .encoded("\"\'\\<")
+                .encoded("\"\'\\<&/>")
                 .validSuite()
                 .invalidSuite(CSSEncoder.INVALID_REPLACEMENT_CHARACTER)
                 .encodedSuite()

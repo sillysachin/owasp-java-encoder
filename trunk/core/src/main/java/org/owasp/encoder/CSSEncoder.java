@@ -65,10 +65,7 @@ class CSSEncoder extends Encoder {
          *   Allows: "\\{nl}" (escaped newline)
          * </pre>
          */
-        STRING(
-//            ~((1L << '\n') | (1L << '\r') | (1L << '\f') | (1L << '\"') | (1L << '\'')),
-            (-1L << ' ') & ~((1L << '\"') | (1L << '\'') | (1L << '<')),
-            ~((1L << ('\\' - LONG_BITS)) | (1L << (Unicode.DEL - LONG_BITS)))),
+        STRING(new ASCIIBits().set(' ', '~').clear("\"\'<&/\\>")),
 
         /**
          * URL context.  Characters inside a "url(...)".
@@ -79,9 +76,7 @@ class CSSEncoder extends Encoder {
          *            \\[^\n\r\f0-9a-f]
          * </pre>
          */
-        URL(
-            (1L << '!') | (1L << '#') | (1L << '$') | (1L << '%') | (1L << '&') | ((-1L << '*') & ~(1L << '<')),
-            ~((1L << ('\\' - LONG_BITS)) | (1L << (Unicode.DEL - LONG_BITS)))),
+        URL(new ASCIIBits().set("!#$%").set('*', '[').set(']', '~').clear("/<>")),
 
         // In both contexts above '<' is added to protect embedded <style> contexts.
 
@@ -103,12 +98,11 @@ class CSSEncoder extends Encoder {
         /**
          * Creates a mode with the specified low and high bit-masks.
          *
-         * @param lowMask the low mask
-         * @param highMask the high mask
+         * @param bits the bit-masks of valid characters.
          */
-        Mode(long lowMask, long highMask) {
-            _lowMask = lowMask;
-            _highMask = highMask;
+        Mode(ASCIIBits bits) {
+            _lowMask = bits._lowerMask;
+            _highMask = bits._upperMask;
         }
 
         /**
