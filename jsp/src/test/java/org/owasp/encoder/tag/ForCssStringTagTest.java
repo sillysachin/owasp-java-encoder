@@ -67,7 +67,7 @@ public class ForCssStringTagTest extends EncodingTagTest {
         System.out.println("doTag");
         ForCssStringTag instance = new ForCssStringTag();
         String value = "<div>";
-        String expected = "\\3c div>";
+        String expected = "\\3c div\\3e";
         instance.setJspContext(_pageContext);
         instance.setValue(value);
         instance.doTag();
