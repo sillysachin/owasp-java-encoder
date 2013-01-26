@@ -46,7 +46,7 @@ public class ChainedEncoderTest extends TestCase {
     public static Test suite() {
         return new EncoderTestSuiteBuilder(
             new ChainedEncoder(
-                new JavaScriptEncoder(),
+                new JavaScriptEncoder(JavaScriptEncoder.Mode.SOURCE, false),
                 new XMLEncoder()), "-safe-", "-\\&-")
 
             // from JavaScriptEncoderTest
