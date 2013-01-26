@@ -176,8 +176,9 @@ public class EncoderTestSuiteBuilder {
         // Check the .encode call
         String actual = Encode.encode(_encoder, input);
 
-        String dbgInput = debugEncode(input);
-        Assert.assertEquals("encode(\""+ dbgInput +"\")", expected, actual);
+        if (!expected.equals(actual)) {
+            Assert.assertEquals("encode(\""+ debugEncode(input) +"\")", expected, actual);
+        }
 
         if (input.equals(actual)) {
             // test that the input string is returned unmodified if
@@ -191,7 +192,10 @@ public class EncoderTestSuiteBuilder {
         EncodedWriter encodedWriter = new EncodedWriter(testWriter, _encoder);
         encodedWriter.write(input);
         encodedWriter.close();
-        Assert.assertEquals("encodeTo(\""+dbgInput+"\",int,int,Writer)", expected, testWriter.toString());
+        actual = testWriter.toString();
+        if (!expected.equals(actual)) {
+            Assert.assertEquals("encodeTo(\""+debugEncode(input)+"\",int,int,Writer)", expected, actual);
+        }
 
         // Check the encodeTo variants (at offset 3)
         String offsetInput = "\0\0\0" + input + "\0\0\0";
@@ -199,7 +203,10 @@ public class EncoderTestSuiteBuilder {
         encodedWriter = new EncodedWriter(testWriter, _encoder);
         encodedWriter.write(offsetInput.toCharArray(), 3, input.length());
         encodedWriter.close();
-        Assert.assertEquals("encodeTo([..."+dbgInput+"...],int,int,Writer)", expected, testWriter.toString());
+        actual = testWriter.toString();
+        if (!expected.equals(actual)) {
+            Assert.assertEquals("encodeTo([..."+debugEncode(input)+"...],int,int,Writer)", expected, actual);
+        }
 
         // Check boundary conditions on CharBuffer encodes
         checkBoundaryEncodes(expected, input);
@@ -225,10 +232,16 @@ public class EncoderTestSuiteBuilder {
             out.compact();
             if (cr.isOverflow()) {
                 CoderResult cr2 = _encoder.encode(in, out, true);
-                Assert.assertTrue("second encode should finish at offset = "+i, cr2.isUnderflow());
+                if (!cr2.isUnderflow()) {
+                    Assert.fail("second encode should finish at offset = "+i);
+                }
             }
             out.flip();
-            Assert.assertEquals("offset = "+i, expected, out.toString());
+
+            String actual = out.toString();
+            if (!expected.equals(actual)) {
+                Assert.assertEquals("offset = "+i, expected, actual);
+            }
         }
     }
 
@@ -436,7 +449,9 @@ public class EncoderTestSuiteBuilder {
                     for (int i = finalMin; i < finalMax; ++i) {
                         String input = new String(chars, 0, Character.toChars(i, chars, 0));
                         String actual = Encode.encode(_encoder, input);
-                        assertEquals("\"" + debugEncode(input) + "\" actual=" + debugEncode(actual), invalidString, actual);
+                        if (!invalidString.equals(actual)) {
+                            assertEquals("\"" + debugEncode(input) + "\" actual=" + debugEncode(actual), invalidString, actual);
+                        }
                         checkBoundaryEncodes(invalidString, input);
                     }
                 }
@@ -478,7 +493,9 @@ public class EncoderTestSuiteBuilder {
                     for (int i= finalMin; i< finalMax; ++i) {
                         String input = new String(chars, 0, Character.toChars(i, chars, 0));
                         String actual = Encode.encode(_encoder, input);
-                        assertFalse("input="+debugEncode(input), actual.equals(input));
+                        if (actual.equals(input)) {
+                            fail("input="+debugEncode(input));
+                        }
                     }
                 }
             });
