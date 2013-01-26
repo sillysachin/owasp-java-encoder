@@ -139,14 +139,6 @@ class JavaScriptEncoder extends Encoder {
             _validMasks[1] &= ~(1 << '&');
         }
 
-//        long lowerMask = mode._lowerMask;
-//        long upperMask = asciiOnly ? mode._upperMask & ~(1L << Unicode.DEL) : mode._upperMask;
-//        _validMasks = new int[] {
-//            (int) lowerMask,
-//            (int)(lowerMask >>> 32),
-//            (int) upperMask,
-//            (int)(upperMask >>> 32),
-//        };
         _asciiOnly = asciiOnly;
         _hexEncodeQuotes = (mode == Mode.ATTRIBUTE || mode == Mode.HTML);
     }
