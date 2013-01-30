@@ -50,7 +50,7 @@ public class JavaScriptEncoderTest extends TestCase {
         for (int asciiOnly = 0 ; asciiOnly <= 1 ; ++asciiOnly) {
             for (JavaScriptEncoder.Mode mode : JavaScriptEncoder.Mode.values()) {
 //                if (!(mode == JavaScriptEncoder.Mode.HTML_CONTENT && asciiOnly == 0)) continue;
-                EncoderTestSuiteBuilder builder = new EncoderTestSuiteBuilder(new JavaScriptEncoder(mode, asciiOnly==1), "-safe-", "-\\-")
+                EncoderTestSuiteBuilder builder = new EncoderTestSuiteBuilder(new JavaScriptEncoder(mode, asciiOnly==1), "(safe)", "(\\)")
                     .encoded(0, 0x1f)
                     .valid(' ', '~')
                     .encoded("\\\'\"");
@@ -75,8 +75,10 @@ public class JavaScriptEncoderTest extends TestCase {
                 switch (mode) {
                 case BLOCK:
                 case HTML:
-                    builder.encode("\\/", "/")
-                        .encoded("/");
+                    builder
+                        .encode("\\/", "/")
+                        .encode("\\-", "-")
+                        .encoded("/-");
                     break;
                 default:
                     builder.encode("/", "/");
