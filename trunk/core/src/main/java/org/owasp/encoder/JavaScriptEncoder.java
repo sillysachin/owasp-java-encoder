@@ -133,7 +133,16 @@ class JavaScriptEncoder extends Encoder {
         };
 
         if (mode == Mode.BLOCK || mode == Mode.HTML) {
-            _validMasks[1] &= ~(1 << '/');
+            // in <script> blocks, we need to prevent the browser from seeing
+            // "</anything>" and "<!--". To do so we escape "/" as "\/" and
+            // escape "-" as "\-".  Both could be solved with a hex encoding
+            // on "<" but we figure "<" appears often in script strings and
+            // the backslash encoding is more readable than a hex encoding.
+            // (And note, a backslash encoding would not prevent the exploits
+            // on "</...>" and "<!--".
+            // In short "</script>" is escaped as "<\/script>" and "<!--" is
+            // escaped as "<!\-\-".
+            _validMasks[1] &= ~((1 << '/') | (1 << '-'));
         }
         if (mode != Mode.SOURCE) {
             _validMasks[1] &= ~(1 << '&');
@@ -257,14 +266,15 @@ class JavaScriptEncoder extends Encoder {
                 case '\'':
                 case '\"':
                     if (_hexEncodeQuotes) {
-                        break;
+                        break hexEncoded;
                     }
                     // fall through
                 case '\\':
                 case '/':
-                    // We'll only see '/' here in the BLOCK and HTML modes
-                    // otherwise it will be accepted as valid by the bitmasks.
-
+                case '-':
+                    // We'll only see '/' and '-' here in the BLOCK and HTML
+                    // modes otherwise it will be accepted as valid by the
+                    // bitmasks.
                     if (j+2 > m) {
                         return overflow(input, i, output, j);
                     }
