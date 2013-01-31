@@ -84,64 +84,69 @@ public final class Encode {
      * bytes or are writing a framework that utilizes this
      * package.</p>
      *
-     * <h5>Example JSP Usage:</h5>
+     * <h5>Example JSP Usage</h5>
      * <pre>
      *     &lt;div>&lt;%=Encode.forHtml(unsafeData)%>&lt;/div>
      *
      *     &lt;input value="&lt;%=Encode.forHtml(unsafeData)%>" />
      * </pre>
      *
-     * <h5>Encoding Description</h5>
-     * <table cellspacing="1" cellpadding="1" border="0">
+     * <h5>Encoding Table</h5>
+     * <table border="0">
      *   <thead>
      *     <tr bgcolor="#ccf">
-     *       <th align="left" colspan="2">Input Character</th>
-     *       <th align="left">Encoded Result</th>
-     *       <th align="left">Notes</th>
+     *       <th align="left">Input</th>
+     *       <th align="left">Result</th>
      *     </tr>
      *   </thead>
      *   <tbody>
      *     <tr>
-     *       <td>U+0026</td>
-     *       <td><code>&amp;</code></td>
-     *       <td><code>&amp;amp;</code></td>
-     *       <td></td>
+     *       <td>&ldquo;{@code &}&rdquo;</td>
+     *       <td>&ldquo;{@code &amp;}&rdquo;</td>
      *     </tr>
      *     <tr>
-     *       <td>U+003C</td>
-     *       <td><code>&lt;</code></td>
-     *       <td><code>&amp;lt;</code></td>
-     *       <td></td>
+     *       <td>&ldquo;{@code <}&rdquo;</td>
+     *       <td>&ldquo;{@code &lt;}&rdquo;</td>
      *     </tr>
      *     <tr>
-     *       <td>U+003E</td>
-     *       <td><code>&gt;</code></td>
-     *       <td><code>&amp;gt;</code></td>
-     *       <td>This escape is not strictly required, but is
-     *       included for maximum compatibility.</td>
+     *       <td>&ldquo;{@code >}&rdquo;</td>
+     *       <td>&ldquo;{@code &gt;}&rdquo;</td>
      *     </tr>
      *     <tr>
-     *       <td>U+0022</td>
-     *       <td><code>"</code></td>
-     *       <td><code>&amp;#34;</code></td>
-     *       <td>"&amp;quot;" would also be valid.  The numeric
-     *       version is used since it is shorter.</td>
+     *       <td>&ldquo;{@code "}&rdquo;</td>
+     *       <td>&ldquo;{@code &#34;}&rdquo;</td>
      *     </tr>
      *     <tr>
-     *       <td>U+0027</td>
-     *       <td><code>'</code></td>
-     *       <td><code>&amp;#39;</code></td>
-     *       <td></td>
+     *       <td>&ldquo;{@code '}&rdquo;</td>
+     *       <td>&ldquo;{@code &#39;}&rdquo;</td>
      *     </tr>
      *   </tbody>
      * </table>
      *
-     * <p>In addition to the above translation, only <a
-     * href="http://www.w3.org/TR/REC-xml/#charsets">characters that
-     * are valid according to the XML specification</a> are allowed
-     * through.  Invalid characters are replaced with a single space
-     * character (U+0020).  This additional step enables XHTML
-     * compliance when utilizing this method.</p>
+     * <h5>Additional Notes</h5>
+     * <ul>
+     *
+     * <li>The encoding of the greater-than sign ({@code >}) is not
+     * strictly required, but is included for maximum
+     * compatibility.</li>
+     *
+     * <li>Numeric encoding is used for double-quote character ({@code
+     * "}) as it shorter than the also valid {@code &quot;}.</li>
+     *
+     * <li>Carriage return (U+0D), line-feed (U+0A), horizontal tab
+     * (U+09) and space (U+20) are valid in quoted attributes and in
+     * block as are not escaped.</li>
+     *
+     * <li>Surrogate pairs are passed through only if valid.</li>
+     *
+     * <li>Characters that are not <a
+     * href="http://www.w3.org/TR/REC-xml/#charsets">valid according
+     * to the XML specification</a> are replaced by a space character
+     * as they could lead to parsing errors.  In particular only {@code #x9
+     * | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] |
+     * [#x10000-#x10FFFF]} are considered valid.</li>
+     *
+     * </ul>
      *
      * @param input the data to encode
      * @return the data encoded for html.
@@ -168,9 +173,62 @@ public final class Encode {
      * HTML attributes.  Use either forHtml or forHtmlAttribute for those
      * methods.</p>
      *
+     * <h5>Example JSP Usage</h5>
      * <pre>
      *     &lt;div>&lt;%=Encode.forHtmlContent(unsafeData)%>&lt;/div>
      * </pre>
+     * <h5>Encoding Table</h5>
+     * <table border="0">
+     *   <thead>
+     *     <tr bgcolor="#ccf">
+     *       <th align="left">Input</th>
+     *       <th align="left">Result</th>
+     *     </tr>
+     *   </thead>
+     *   <tbody>
+     *     <tr>
+     *       <td>&ldquo;{@code &}&rdquo;</td>
+     *       <td>&ldquo;{@code &amp;}&rdquo;</td>
+     *     </tr>
+     *     <tr>
+     *       <td>&ldquo;{@code <}&rdquo;</td>
+     *       <td>&ldquo;{@code &lt;}&rdquo;</td>
+     *     </tr>
+     *     <tr>
+     *       <td>&ldquo;{@code >}&rdquo;</td>
+     *       <td>&ldquo;{@code &gt;}&rdquo;</td>
+     *     </tr>
+     *   </tbody>
+     * </table>
+     *
+     * <h5>Additional Notes</h5>
+     * <ul>
+     *
+     * <li>Single-quote character ({@code '}) and double-quote
+     * character ({@code "}) do not require encoding in HTML
+     * blocks, unlike other HTML contexts.</li>
+     *
+     * <li>The encoding of the greater-than sign ({@code >}) is not
+     * strictly required, but is included for maximum
+     * compatibility.</li>
+     *
+     * <li>Numeric encoding is used for double-quote character ({@code
+     * "}) as it shorter than the also valid {@code &quot;}.</li>
+     *
+     * <li>Carriage return (U+0D), line-feed (U+0A), horizontal tab
+     * (U+09) and space (U+20) are valid in quoted attributes and in
+     * block as are not escaped.</li>
+     *
+     * <li>Surrogate pairs are passed through only if valid.</li>
+     *
+     * <li>Characters that are not <a
+     * href="http://www.w3.org/TR/REC-xml/#charsets">valid according
+     * to the XML specification</a> are replaced by a space character
+     * as they could lead to parsing errors.  In particular only {@code #x9
+     * | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] |
+     * [#x10000-#x10FFFF]} are considered valid.</li>
+     *
+     * </ul>
      *
      * @param input the input to encode
      * @return the encoded result
@@ -196,9 +254,66 @@ public final class Encode {
     /**
      * <p>This method encodes for HTML text attributes.</p>
      *
+     * <h5>Example JSP Usage</h5>
      * <pre>
      *     &lt;div>&lt;%=Encode.forHtml(unsafeData)%>&lt;/div>
      * </pre>
+     *
+     * <h5>Encoding Table</h5>
+     * <table border="0">
+     *   <thead>
+     *     <tr bgcolor="#ccf">
+     *       <th align="left">Input</th>
+     *       <th align="left">Result</th>
+     *     </tr>
+     *   </thead>
+     *   <tbody>
+     *     <tr>
+     *       <td>&ldquo;{@code &}&rdquo;</td>
+     *       <td>&ldquo;{@code &amp;}&rdquo;</td>
+     *     </tr>
+     *     <tr>
+     *       <td>&ldquo;{@code <}&rdquo;</td>
+     *       <td>&ldquo;{@code &lt;}&rdquo;</td>
+     *     </tr>
+     *     <tr>
+     *       <td>&ldquo;{@code "}&rdquo;</td>
+     *       <td>&ldquo;{@code &#34;}&rdquo;</td>
+     *     </tr>
+     *     <tr>
+     *       <td>&ldquo;{@code '}&rdquo;</td>
+     *       <td>&ldquo;{@code &#39;}&rdquo;</td>
+     *     </tr>
+     *   </tbody>
+     * </table>
+     *
+     * <h5>Additional Notes</h5>
+     * <ul>
+     *
+     * <li>Both the single-quote character ({@code '}) and the
+     * double-quote character ({@code "}) are encoded so this is safe
+     * for HTML attributes with either enclosing character.</li>
+     *
+     * <li>The encoding of the greater-than sign ({@code >}) is not
+     * required for attributes.</li>
+     *
+     * <li>Numeric encoding is used for double-quote character ({@code
+     * "}) as it shorter than the also valid {@code &quot;}.</li>
+     *
+     * <li>Carriage return (U+0D), line-feed (U+0A), horizontal tab
+     * (U+09) and space (U+20) are valid in quoted attributes and in
+     * block as are not escaped.</li>
+     *
+     * <li>Surrogate pairs are passed through only if valid.</li>
+     *
+     * <li>Characters that are not <a
+     * href="http://www.w3.org/TR/REC-xml/#charsets">valid according
+     * to the XML specification</a> are replaced by a space character
+     * as they could lead to parsing errors.  In particular only {@code #x9
+     * | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] |
+     * [#x10000-#x10FFFF]} are considered valid.</li>
+     *
+     * </ul>
      *
      * @param input the input to encode
      * @return the encoded result
@@ -235,9 +350,67 @@ public final class Encode {
      * err on the side of including a space character after the
      * value.</p>
      *
+     * <p>Use of this method is discouraged as quoted attributes are
+     * generally more compatible and safer.  Also note, that no
+     * attempt has been made to optimize this encoding, though it is
+     * still probably faster than other encoding libraries.</p>
+     *
+     * <h5>Example JSP Usage</h5>
      * <pre>
      *     &lt;input value=&lt;%=Encode.forHtmlUnquotedAttribute(input)%> >
      * </pre>
+     *
+     * <h5>Encoding Table</h5>
+     * <table border="0">
+     *   <thead>
+     *     <tr bgcolor="#ccf">
+     *       <th align="left">Input</th>
+     *       <th align="left">Result</th>
+     *     </tr>
+     *   </thead>
+     *   <tbody>
+     *     <tr><td>{@code U+0009} (horizontal tab)</td><td>&ldquo;{@code &#9;}&rdquo;</td></tr>
+     *     <tr><td>{@code U+000A} (line feed)</td><td>&ldquo;{@code &#10;}&rdquo;</td></tr>
+     *     <tr><td>{@code U+000C} (form feed)</td><td>&ldquo;{@code &#12;}&rdquo;</td></tr>
+     *     <tr><td>{@code U+000D} (carriage return)</td><td>&ldquo;{@code &#13;}&rdquo;</td></tr>
+     *     <tr><td>{@code U+0020} (space)</td><td>&ldquo;{@code &#32;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code &}&rdquo;</td><td>&ldquo;{@code &amp;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code <}&rdquo;</td><td>&ldquo;{@code &lt;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code >}&rdquo;</td><td>&ldquo;{@code &gt;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code "}&rdquo;</td><td>&ldquo;{@code &#34;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code '}&rdquo;</td><td>&ldquo;{@code &#39;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code /}&rdquo;</td><td>&ldquo;{@code &#47;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code =}&rdquo;</td><td>&ldquo;{@code &#61;}&rdquo;</td></tr>
+     *     <tr><td>&ldquo;{@code `}&rdquo;</td><td>&ldquo;{@code &#96;}&rdquo;</td></tr>
+     *     <tr><td>{@code U+0085} (next line)</td><td>&ldquo;{@code &#133;}&rdquo;</td></tr>
+     *     <tr><td>{@code U+2028} (line separator)</td><td>&ldquo;{@code &#8232;}&rdquo;</td></tr>
+     *     <tr><td>{@code U+2029} (paragraph separator)</td><td>&ldquo;{@code &#8233;}&rdquo;</td></tr>
+     *   </tbody>
+     * </table>
+     *
+     * <h5>Additional Notes</h5>
+     * <ul>
+     *
+     * <li>The following characters are <i>not</i> encoded:
+     * {@code 0-9, a-z, A-Z}, &ldquo;{@code !}&rdquo;, &ldquo;{@code
+     * #}&rdquo;, &ldquo;{@code $}&rdquo;, &ldquo;{@code %}&rdquo;,
+     * &ldquo;{@code (}&rdquo;, &ldquo;{@code )}&rdquo;, &ldquo;{@code
+     * *}&rdquo;, &ldquo;{@code +}&rdquo;, &ldquo;{@code ,}&rdquo;,
+     * &ldquo;{@code -}&rdquo;, &ldquo;{@code .}&rdquo;, &ldquo;{@code
+     * [}&rdquo;, &ldquo;{@code \}&rdquo;, &ldquo;{@code ]}&rdquo;,
+     * &ldquo;{@code ^}&rdquo;, &ldquo;{@code _}&rdquo;, &ldquo;{@code
+     * }}&rdquo;.</li>
+     *
+     * <li>Surrogate pairs are passed through only if valid.  Invalid
+     * surrogate pairs are replaced by a hyphen (-).</li>
+     *
+     * <li>Characters in the C0 and C1 control blocks and not
+     * otherwise listed above are considered invalid and replaced by a
+     * hyphen (-) character.</li>
+     *
+     * <li>Unicode "non-characters" are replaced by hyphens (-).</li>
+     *
+     * </ul>
      *
      * @param input the attribute value to be encoded.
      * @return the attribute value encoded for unquoted attribute
@@ -279,6 +452,7 @@ public final class Encode {
      * characters.  It is safe for use in both style blocks and attributes in
      * HTML.
      *
+     * <h5>Example JSP Usage</h5>
      * <pre>
      *     &lt;div style="background: url('&lt;=Encode.forCssString(...)%>');">
      *
@@ -286,6 +460,47 @@ public final class Encode {
      *         background: url('&lt;%=Encode.forCssString(...)%>');
      *     &lt;/style>
      * </pre>
+     *
+     * <h5>Encoding  Notes</h5>
+     * <ul>
+     *
+     * <li>The following characters are encoded using hexidecimal
+     * encodings: {@code U+0000} - {@code U+001f},
+     * &ldquo;{@code "}&rdquo;,
+     * &ldquo;{@code '}&rdquo;,
+     * &ldquo;{@code \}&rdquo;,
+     * &ldquo;{@code <}&rdquo;,
+     * &ldquo;{@code &}&rdquo;,
+     * &ldquo;{@code (}&rdquo;,
+     * &ldquo;{@code )}&rdquo;,
+     * &ldquo;{@code /}&rdquo;,
+     * &ldquo;{@code >}&rdquo;,
+     * {@code U+007f},
+     * line separator ({@code U+2028}),
+     * paragraph separator ({@code U+2029}).</li>
+     *
+     * <li>Any character requiring encoding is encoded as {@code \xxx}
+     * where {@code xxx} is the shortest hexidecimal representation of
+     * its Unicode code point (after decoding surrogate pairs if
+     * necessary).  This encoding is never zero padded.  Thus, for
+     * example, the tab character is encoded as {@code \9}, not {@code
+     * \0009}.</li>
+     *
+     * <li>The encoder looks ahead 1 character in the input and
+     * appends a space to an encoding to avoid the next character
+     * becoming part of the hexidecimal encoded sequence.  Thus
+     * &ldquo;{@code '1}&rdquo; is encoded as &ldquo;{@code \27
+     * 1}&rdquo;, and not as &ldquo;{@code \271}&rdquo;.  If a space
+     * is not necessary, it is not included, thus &ldquo;{@code
+     * 'x}&rdquo; is encoded as &ldquo;{@code \27x}&rdquo;, and not as
+     * &ldquo;{@code \27 x}&rdquo;.</li>
+     *
+     * <li>Surrogate pairs are passed through only if valid.  Invalid
+     * surrogate pairs are replaced by an underscore (_).</li>
+     *
+     * <li>Unicode "non-characters" are replaced by underscores (_).</li>
+     *
+     * </ul>
      *
      * @param input the input to encode
      * @return the encoded result
@@ -316,6 +531,7 @@ public final class Encode {
      * itself.  The caller should insure that the URL is safe for embedding
      * (e.g. input validation) by other means.
      *
+     * <h5>Example JSP Usage</h5>
      * <pre>
      *     &lt;div style="background:url(&lt;=Encode.forCssUrl(...)%>);">
      *
@@ -323,6 +539,44 @@ public final class Encode {
      *         background: url(&lt;%=Encode.forCssUrl(...)%>);
      *     &lt;/style>
      * </pre>
+     * <h5>Encoding  Notes</h5>
+     * <ul>
+     *
+     * <li>The following characters are encoded using hexidecimal
+     * encodings: {@code U+0000} - {@code U+001f},
+     * &ldquo;{@code "}&rdquo;,
+     * &ldquo;{@code '}&rdquo;,
+     * &ldquo;{@code \}&rdquo;,
+     * &ldquo;{@code <}&rdquo;,
+     * &ldquo;{@code &}&rdquo;,
+     * &ldquo;{@code /}&rdquo;,
+     * &ldquo;{@code >}&rdquo;,
+     * {@code U+007f},
+     * line separator ({@code U+2028}),
+     * paragraph separator ({@code U+2029}).</li>
+     *
+     * <li>Any character requiring encoding is encoded as {@code \xxx}
+     * where {@code xxx} is the shortest hexidecimal representation of
+     * its Unicode code point (after decoding surrogate pairs if
+     * necessary).  This encoding is never zero padded.  Thus, for
+     * example, the tab character is encoded as {@code \9}, not {@code
+     * \0009}.</li>
+     *
+     * <li>The encoder looks ahead 1 character in the input and
+     * appends a space to an encoding to avoid the next character
+     * becoming part of the hexidecimal encoded sequence.  Thus
+     * &ldquo;{@code '1}&rdquo; is encoded as &ldquo;{@code \27
+     * 1}&rdquo;, and not as &ldquo;{@code \271}&rdquo;.  If a space
+     * is not necessary, it is not included, thus &ldquo;{@code
+     * 'x}&rdquo; is encoded as &ldquo;{@code \27x}&rdquo;, and not as
+     * &ldquo;{@code \27 x}&rdquo;.</li>
+     *
+     * <li>Surrogate pairs are passed through only if valid.  Invalid
+     * surrogate pairs are replaced by an underscore (_).</li>
+     *
+     * <li>Unicode "non-characters" are replaced by underscores (_).</li>
+     *
+     * </ul>
      *
      * @param input the input to encode
      * @return the encoded result
@@ -353,6 +607,41 @@ public final class Encode {
      * particularly dangerous context to put untrusted content in, as for
      * example a "javascript:" URL provided by a malicious user would be
      * "properly" escaped, and still execute.
+     *
+     * <h5>Encoding Table</h5>
+     * <p>The following characters are <i>not</i> encoded:</p>
+     * <pre>
+     * U+20:   !   # $   & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 : ;   =   ?
+     * U+40: @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [   ]   _
+     * U+60:   a b c d e f g h i j k l m n o p q r s t u v w x y z       ~
+     * </pre>
+     *
+     * <h5>Encoding Notes</h5>
+     * <ul>
+     *
+     *   <li>The single-quote character({@code '}) <b>is not encoded</b>.</li>
+     *
+     *   <li>This encoding is not intended to be used standalone.  The
+     *   output should be encoded to the target context.  For example:
+     *   {@code <a
+     *   href="<%=Encode.forHtmlAttribute(Encode.forUri(uri))%>">...</a>}.
+     *   (Note, the single-quote character ({@code '}) is not
+     *   encoded.)</li>
+     *
+     *   <li>URL encoding is an encoding for bytes, not unicode.  The
+     *   input string is thus first encoded as a sequence of UTF-8
+     *   byte.  The bytes are then encoded as {@code %xx} where {@code
+     *   xx} is the two-digit hexidecimal representation of the
+     *   byte. (The implementation does this as one step for
+     *   performance.)</li>
+     *
+     *   <li>Surrogate pairs are first decoded to a Unicode code point
+     *   before encoding as UTF-8.</li>
+     *
+     *   <li>Invalid characters (e.g. partial or invalid surrogate
+     *   pairs), are replaced with a hyphen ({@code -}) character.</li>
+     *
+     * </ul>
      *
      * @param input the input to encode
      * @return the encoded result
@@ -387,6 +676,36 @@ public final class Encode {
      *     &lt;a href="/search?value=&lt;%=Encode.forUriComponent(...)%>&order=1#top">
      * </pre>
      *
+     * <h5>Encoding Table</h5>
+     * <p>The following characters are <i>not</i> encoded:</p>
+     * <pre>
+     * U+20:                           - .   0 1 2 3 4 5 6 7 8 9
+     * U+40: @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z         _
+     * U+60:   a b c d e f g h i j k l m n o p q r s t u v w x y z       ~
+     * </pre>
+     *
+     * <h5>Encoding Notes</h5>
+     * <ul>
+     *
+     *   <li>Unlike {@link #forUri(String)} this method is safe to be
+     *   used in most containing contexts, including: HTML/XML, CSS,
+     *   and JavaScript contexts.</li>
+     *
+     *   <li>URL encoding is an encoding for bytes, not unicode.  The
+     *   input string is thus first encoded as a sequence of UTF-8
+     *   byte.  The bytes are then encoded as {@code %xx} where {@code
+     *   xx} is the two-digit hexidecimal representation of the
+     *   byte. (The implementation does this as one step for
+     *   performance.)</li>
+     *
+     *   <li>Surrogate pairs are first decoded to a Unicode code point
+     *   before encoding as UTF-8.</li>
+     *
+     *   <li>Invalid characters (e.g. partial or invalid surrogate
+     *   pairs), are replaced with a hyphen ({@code -}) character.</li>
+     *
+     * </ul>
+     *
      * @param input the input to encode
      * @return the encoded result
      */
@@ -409,9 +728,10 @@ public final class Encode {
     }
 
     /**
-     * Encoder for XML and XHTML.
+     * Encoder for XML and XHTML.  See {@link #forHtml(String)} for a
+     * description of the encoding and context.
      *
-     * @see #forHtml(String) forHtml(string) for general description of context.
+     * @see #forHtml(String)
      * @param input the input to encode
      * @return the encoded result
      */
@@ -434,9 +754,11 @@ public final class Encode {
     }
 
     /**
-     * Encoder for XML and XHTML text content.
+     * Encoder for XML and XHTML text content.  See {@link
+     * #forHtmlContent(String)} for description of encoding and
+     * context.
      *
-     * @see #forHtmlContent(String) forHtmlContent(String) for general description of context.
+     * @see #forHtmlContent(String)
      * @param input the input to encode
      * @return the encoded result
      */
@@ -459,9 +781,11 @@ public final class Encode {
     }
 
     /**
-     * Encoder for XML and XHTML attribute content.
+     * Encoder for XML and XHTML attribute content.  See {@link
+     * #forHtmlAttribute(String)} for description of encoding and
+     * context.
      *
-     * @see #forHtmlAttribute(String) forHtmlAttribute(String) for general description of context.
+     * @see #forHtmlAttribute(String)
      * @param input the input to encode
      * @return the encoded result
      */
