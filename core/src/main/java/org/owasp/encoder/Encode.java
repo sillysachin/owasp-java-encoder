@@ -135,7 +135,7 @@ public final class Encode {
      *
      * <li>Carriage return (U+0D), line-feed (U+0A), horizontal tab
      * (U+09) and space (U+20) are valid in quoted attributes and in
-     * block as are not escaped.</li>
+     * block in an unescaped form.</li>
      *
      * <li>Surrogate pairs are passed through only if valid.</li>
      *
@@ -217,7 +217,7 @@ public final class Encode {
      *
      * <li>Carriage return (U+0D), line-feed (U+0A), horizontal tab
      * (U+09) and space (U+20) are valid in quoted attributes and in
-     * block as are not escaped.</li>
+     * block in an unescaped form.</li>
      *
      * <li>Surrogate pairs are passed through only if valid.</li>
      *
@@ -302,7 +302,7 @@ public final class Encode {
      *
      * <li>Carriage return (U+0D), line-feed (U+0A), horizontal tab
      * (U+09) and space (U+20) are valid in quoted attributes and in
-     * block as are not escaped.</li>
+     * block in an unescaped form.</li>
      *
      * <li>Surrogate pairs are passed through only if valid.</li>
      *
