@@ -120,6 +120,7 @@
     <modules>
         <module>core</module>
         <module>jsp</module>
+      <module>esapi</module>
     </modules>
 
 </project>
