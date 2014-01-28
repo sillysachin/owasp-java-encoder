@@ -23,11 +23,11 @@
     <parent>
         <groupId>org.owasp.encoder</groupId>
         <artifactId>encoder-parent</artifactId>
-        <version>1.1.1</version>
+        <version>1.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>encoder-esapi</artifactId>
-    <version>1.1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>OWASP Encoders ESAPI Thunk</name>
@@ -178,7 +178,7 @@
       <dependency>
         <groupId>org.owasp.encoder</groupId>
         <artifactId>encoder</artifactId>
-        <version>1.1.1</version>
+        <version>1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.owasp.esapi</groupId>
