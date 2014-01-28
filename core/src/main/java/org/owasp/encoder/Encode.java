@@ -1300,7 +1300,7 @@ public final class Encode {
             final int n = str.length();
             final int remaining = n - j;
 
-            if (remaining <= INPUT_BUFFER_SIZE) {
+            if (remaining <= INPUT_BUFFER_SIZE && j <= OUTPUT_BUFFER_SIZE) {
                 // the remaining input to encode fits completely in the pre-
                 // allocated buffer.
                 str.getChars(0, j, _output.array(), 0);
