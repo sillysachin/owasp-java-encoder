@@ -646,7 +646,7 @@ public final class Encode {
      * @param input the input to encode
      * @return the encoded result
      */
-    public static String forUri(String input) {
+    @Deprecated public static String forUri(String input) {
         return encode(Encoders.URI_ENCODER, input);
     }
 
