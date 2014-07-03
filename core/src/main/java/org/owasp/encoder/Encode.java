@@ -714,16 +714,6 @@ public final class Encode {
     public static String forUriComponent(String input) {
         return encode(Encoders.URI_COMPONENT_ENCODER, input);
     }
-    
-    /**
-     * This is a convenience method which simply calls forUriComponent.
-     * 
-     * @param input the input to encode
-     * @return the encoded result
-     */
-    public static String forUrlComponent(String input) {
-        return forUriComponent(input);
-    }
 
     /**
      * See {@link #forUriComponent(String)} for description of encoding.  This
