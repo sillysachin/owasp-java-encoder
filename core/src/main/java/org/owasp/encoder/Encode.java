@@ -212,9 +212,6 @@ public final class Encode {
      * strictly required, but is included for maximum
      * compatibility.</li>
      *
-     * <li>Numeric encoding is used for double-quote character ({@code
-     * "}) as it shorter than the also valid {@code &quot;}.</li>
-     *
      * <li>Carriage return (U+0D), line-feed (U+0A), horizontal tab
      * (U+09) and space (U+20) are valid in quoted attributes and in
      * block in an unescaped form.</li>
