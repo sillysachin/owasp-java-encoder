@@ -62,19 +62,6 @@ public final class Encode {
     private Encode() {}
 
     /**
-     * A ThreadLocal buffer used for performing the encoding.  The buffer
-     * can significantly reduce the amount of allocations required to
-     * perform encoding, but may not be needed if GC performance becomes
-     * a non-issue.
-     */
-    private static ThreadLocal<Buffer> _localBuffer = new ThreadLocal<Buffer>() {
-        @Override
-        protected Buffer initialValue() {
-            return new Buffer();
-        }
-    };
-
-    /**
      * <p>Encodes for (X)HTML text content and text attributes.  Since
      * this method encodes for both contexts, it may be slightly less
      * efficient to use this method over the methods targeted towards
@@ -1191,7 +1178,7 @@ public final class Encode {
      * Core encoding loop shared by public methods.  It first uses the
      * encoder to scan the input for characters that need encoding.  If
      * no characters require encoding, the input string is returned.
-     * Otherwise a thread-local buffer is used to encode the remainder
+     * Otherwise a buffer is used to encode the remainder
      * of the input.
      *
      * @param encoder the encoder to use
@@ -1213,17 +1200,17 @@ public final class Encode {
             return str;
         }
 
-        // otherwise, we need to encode.  We use a thread-local buffer to avoid
+        // otherwise, we need to encode.  We use a buffer to avoid
         // excessive memory allocation for these calls.  Note: this means that
         // an encoder implementation must NEVER call this method internally.
-        return _localBuffer.get().encode(encoder, str, j);
+        return new Buffer().encode(encoder, str, j);
     }
 
     /**
      * Core encoding loop shared by public methods.  It first uses the
      * encoder to scan the input for characters that need encoding.  If no
      * characters require encoding, the input string is written directly to
-     * the writer.  Otherwise a thread-local buffer is used to encode the
+     * the writer.  Otherwise a buffer is used to encode the
      * remainder of the input to the buffers.  This version saves a wrapping
      * in an String.
      *
@@ -1250,15 +1237,14 @@ public final class Encode {
             return;
         }
 
-        // otherwise, we need to encode.  We use a thread-local buffer to avoid
+        // otherwise, we need to encode.  We use a buffer to avoid
         // excessive memory allocation for these calls.  Note: this means that
         // an encoder implementation must NEVER call this method internally.
-        _localBuffer.get().encode(encoder, out, str, j);
+        new Buffer().encode(encoder, out, str, j);
     }
 
     /**
-     * A buffer used for encoding.  Stored as a thread-local to avoid repeated
-     * allocation.
+     * A buffer used for encoding.
      */
     static class Buffer {
         /**
